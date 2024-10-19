@@ -26,7 +26,7 @@ struct SignupView: View {
                 InputView(text: .constant(""), title: "Email Address", placeholder: "name@example.com")
                 InputView(text: .constant(""), title: "Password", placeholder: "name@example.com")
                 InputView(text: .constant(""), title: "Confirm Password", placeholder: "***************")
-                ButtonView(title: "Sign up")
+//                ButtonView(title: "Sign up")
             }
             .padding(.horizontal, 20)
             Spacer()

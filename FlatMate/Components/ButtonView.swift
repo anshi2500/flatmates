@@ -9,9 +9,12 @@ import SwiftUI
 
 struct ButtonView: View {
     let title: String
+    let action: () -> Void
     
     var body: some View {
-        Button {} label: {
+        Button {action: do {
+            self.action()
+        }} label: {
             HStack {
                 Text(title)
                     .font(.custom("Outfit-Medium", size: 17))
@@ -26,5 +29,5 @@ struct ButtonView: View {
 }
 
 #Preview {
-    ButtonView(title: "Log In")
+    ButtonView(title: "Log In", action: {})
 }

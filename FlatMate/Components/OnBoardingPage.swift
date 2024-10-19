@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct LandingPage: View {
+struct OnBoardingPage: View {
     @State private var opacityEffect: Bool = false
     @State private var clipEdges: Bool = false
     
@@ -17,12 +17,6 @@ struct LandingPage: View {
     
     var body: some View {
         VStack {
-            Image("Logo")
-                .resizable()
-                .scaledToFit()
-                .frame(height: 103)
-                .padding(.bottom, 20)
-            
             Image(imageName)
                 .resizable()
                 .scaledToFit()
@@ -46,5 +40,5 @@ struct LandingPage: View {
 }
 
 #Preview {
-    LandingPage(imageName: "landingPageImage-1", title: "Live with like-minded people.", description: "It's easier than you think.")
+    OnBoardingPage(imageName: "landingPageImage-1", title: "Live with like-minded people.", description: "It's easier than you think.")
 }

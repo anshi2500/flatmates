@@ -22,7 +22,7 @@ struct LoginView: View {
             VStack {
                 InputView(text: .constant(""), title: "Email Address", placeholder: "name@example.com")
                 InputView(text: .constant(""), title: "Password", placeholder: "***************")
-                ButtonView(title: "Log In")
+//                ButtonView(title: "Log In")
             }
             .padding(.horizontal, 20)
             Spacer()
