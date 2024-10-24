@@ -20,8 +20,8 @@ struct LoginView: View {
                 .multilineTextAlignment(.center)
                 .padding(.vertical, 20)
             VStack {
-                InputView(text: .constant(""), title: "Email Address", placeholder: "name@example.com")
-                InputView(text: .constant(""), title: "Password", placeholder: "***************")
+                InputView(text: .constant(""), title: "Email Address", placeholder: "name@example.com", isSecureField: false)
+                InputView(text: .constant(""), title: "Password", placeholder: "***************", isSecureField: true)
                 ButtonView(title: "Log In", action: {})
             }
             .padding(.horizontal, 20)
