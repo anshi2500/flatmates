@@ -7,6 +7,17 @@
 
 import SwiftUI
 
+struct InputFieldStyle: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .font(.custom("Outfit-ExtraLight", size: 17))
+            .foregroundColor(.black)
+            .padding(.all, 12)
+            .background(Color("primaryBackground"))
+            .cornerRadius(10)
+    }
+}
+
 struct InputView: View {
     @Binding var text: String
     let title: String
@@ -19,21 +30,10 @@ struct InputView: View {
                 .font(.custom("Outfit-ExtraLight", size: 17))
                 .padding(.bottom, -5)
             
-            if isSecureField {
-                SecureField(placeholder, text: $text)
-                    .font(.custom("Outfit-ExtraLight", size: 17))
-                    .foregroundColor(.black) // This sets the color of the typed text
-                    .padding(.all, 12)
-                    .background(Color("primaryBackground")) // Using the custom color
-                    .cornerRadius(10) // Rounded corners
-            } else {
-                TextField(placeholder, text: $text)
-                    .font(.custom("Outfit-ExtraLight", size: 17))
-                    .foregroundColor(.black)
-                    .padding(.all, 12)
-                    .background(Color("primaryBackground")) // Using the custom color
-                    .cornerRadius(10) // Rounded corners
-            }
+            // Ternary operator to decide between SecureField and TextField
+            (isSecureField ? AnyView(SecureField(placeholder, text: $text))
+                           : AnyView(TextField(placeholder, text: $text)))
+                .modifier(InputFieldStyle())
         }
         .frame(maxWidth: .infinity, minHeight: 48) // Adjusted frame
         .padding(.bottom, 20)
