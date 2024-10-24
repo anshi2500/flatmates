@@ -7,7 +7,10 @@
 
 import SwiftUI
 
-struct LoginView: View {    
+struct LoginView: View {
+    @State private var email = ""
+    @State private var password = ""
+    
     var body: some View {
         VStack {
             Image("Logo")
@@ -20,8 +23,8 @@ struct LoginView: View {
                 .multilineTextAlignment(.center)
                 .padding(.vertical, 20)
             VStack {
-                InputView(text: .constant(""), title: "Email Address", placeholder: "name@example.com", isSecureField: false)
-                InputView(text: .constant(""), title: "Password", placeholder: "***************", isSecureField: true)
+                InputView(text: $email, title: "Email Address", placeholder: "name@example.com", isSecureField: false)
+                InputView(text: $password, title: "Password", placeholder: "***************", isSecureField: true)
                 ButtonView(title: "Log In", action: {})
             }
             .padding(.horizontal, 20)

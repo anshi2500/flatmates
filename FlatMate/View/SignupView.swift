@@ -8,6 +8,10 @@
 import SwiftUI
 
 struct SignupView: View {
+    @State private var username = ""
+    @State private var fullname = ""
+    @State private var password = ""
+    @State private var confirmPassword = ""
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
@@ -22,10 +26,10 @@ struct SignupView: View {
                 .multilineTextAlignment(.center)
                 .padding(.vertical, 20)
             VStack {
-                InputView(text: .constant(""), title: "Username", placeholder: "username", isSecureField: false)
-                InputView(text: .constant(""), title: "Email Address", placeholder: "name@example.com", isSecureField: false)
-                InputView(text: .constant(""), title: "Password", placeholder: "***************", isSecureField: true)
-                InputView(text: .constant(""), title: "Confirm Password", placeholder: "***************", isSecureField: true)
+                InputView(text: $username, title: "Username", placeholder: "username", isSecureField: false)
+                InputView(text: $fullname, title: "Email Address", placeholder: "name@example.com", isSecureField: false)
+                InputView(text: $password, title: "Password", placeholder: "***************", isSecureField: true)
+                InputView(text: $confirmPassword, title: "Confirm Password", placeholder: "***************", isSecureField: true)
                 ButtonView(title: "Sign up", action: {})
             }
             .padding(.horizontal, 20)
