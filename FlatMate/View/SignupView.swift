@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SignupView: View {
     @Environment(\.dismiss) var dismiss
-    
+
     var body: some View {
         VStack {
             Image("Logo")
