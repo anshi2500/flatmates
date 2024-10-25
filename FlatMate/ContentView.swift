@@ -10,7 +10,8 @@ import SwiftUI
 struct ContentView: View {
     var body: some View {
         NavigationStack {
-            LandingPageView() // Entry point of the app
+//            LandingPageView()  Entry point of the app
+            SwipePageView()
         }
     }
 }
@@ -18,3 +19,4 @@ struct ContentView: View {
 #Preview {
     ContentView()
 }
+
