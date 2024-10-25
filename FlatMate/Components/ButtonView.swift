@@ -10,20 +10,20 @@ import SwiftUI
 struct ButtonView: View {
     let title: String
     let action: () -> Void
-    
+
     var body: some View {
-        Button {action: do {
+        Button(action: {
             self.action()
-        }} label: {
+        }) {
             HStack {
                 Text(title)
                     .font(.custom("Outfit-Medium", size: 17))
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity, minHeight: 48) // Adjusted frame
             }
-            .foregroundColor(.white)
-            .frame(maxWidth: .infinity, minHeight: 48) // Adjusted frame
+            .background(Color("primary"))
+            .cornerRadius(10)
         }
-        .background(Color("primary"))
-        .cornerRadius(10)
         .padding(.top, 24)
     }
 }

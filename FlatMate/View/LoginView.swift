@@ -10,40 +10,60 @@ import SwiftUI
 struct LoginView: View {
     @State private var email = ""
     @State private var password = ""
-    
+    @State private var isLoginActive = false // State to manage navigation
+
     var body: some View {
-        VStack {
-            Image("Logo")
-                .resizable()
-                .scaledToFit()
-                .frame(height: 103)
-                .padding(.bottom, 20)
-            Text("Welcome Back")
-                .font(.custom("Outfit-Bold", size: 28))
-                .multilineTextAlignment(.center)
-                .padding(.vertical, 20)
+        NavigationView {
             VStack {
-                InputView(text: $email, title: "Email Address", placeholder: "name@example.com", isSecureField: false)
-                InputView(text: $password, title: "Password", placeholder: "***************", isSecureField: true)
-                ButtonView(title: "Log In", action: {})
+                // Logo Image
+                Image("Logo")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 103)
+                    .padding(.bottom, 20)
+
+                // Welcome Text
+                Text("Welcome Back")
+                    .font(.custom("Outfit-Bold", size: 28))
+                    .multilineTextAlignment(.center)
+                    .padding(.vertical, 20)
+
+                // Input Fields
+                VStack {
+                    InputView(text: $email, title: "Email Address", placeholder: "name@example.com", isSecureField: false)
+                    InputView(text: $password, title: "Password", placeholder: "***************", isSecureField: true)
+
+                    // Use ButtonView for the Log In button
+                    ButtonView(title: "Log In") {
+                        isLoginActive = true // Activate navigation on button press
+                    }
+                }
+                .padding(.horizontal, 20)
+
+                Spacer()
+
+                // Sign Up Section
+                HStack {
+                    Text("Don't have an account?")
+                        .font(.custom("Outfit-Regular", size: 17))
+                        .foregroundColor(.primary)
+
+                    NavigationLink(destination: SignupView().navigationBarBackButtonHidden(true)) {
+                        Text("Register")
+                            .font(.custom("Outfit-Bold", size: 17))
+                            .foregroundColor(Color("primary"))
+                            .underline()
+                    }
+                }
+                .padding(.bottom, 20)
             }
             .padding(.horizontal, 20)
-            Spacer()
-            HStack {
-                Text("Don't have an account?")
-                    .font(.custom("Outfit-Regular", size: 17))
-                    .foregroundColor(.primary)
-                
-                NavigationLink(destination: SignupView().navigationBarBackButtonHidden(true)) { // Navigates to the signup view
-                    Text("Register")
-                        .font(.custom("Outfit-Bold", size: 17))
-                        .foregroundColor(Color("primary")) // Use your custom primary color here
-                        .underline()
-                }
+            .navigationBarHidden(true)
+            // Add .navigationDestination here
+            .navigationDestination(isPresented: $isLoginActive) {
+                MainView()
             }
-            .padding(.bottom, 20)
         }
-        .padding(.horizontal, 20)
     }
 }
 
