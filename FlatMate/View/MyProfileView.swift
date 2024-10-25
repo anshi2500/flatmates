@@ -17,10 +17,6 @@ struct ProfileView: View {
     @State private var isEditProfileClicked = false
     @State private var isLogOutClicked = false
     
-    // Color used in Figma for the selected button's background
-    let selectedButtonColor = Color(red: 34/255, green: 87/255, blue: 122/255)
-        
-
     var body: some View {
         VStack {
             // Logo at the top
@@ -32,103 +28,41 @@ struct ProfileView: View {
             
             Image("profileImage")
                 .resizable()
+                .aspectRatio(contentMode: .fill)
                 .clipShape(Circle())
-                .overlay(Circle().stroke(Color.gray, lineWidth: 5))
-                .frame(width: 200, height: 200)
+                .frame(width: 220, height: 220)
                 .padding(.top, 20)
-                .padding(.bottom, 10)
+                .padding(.bottom, 5)
+                .shadow(radius: 10)
                 
-            Text("\(userName) , \(userAge)")
+            Text("\(userName), \(userAge)")
                 .font(.title)
                 .fontWeight(.bold)
 
             Spacer()
-
-            // Buttons: Settings, Edit Profile, Log Out
+            
+            // Reuse ProfileButton Component for Settings, Edit Profile, Logout
             VStack(spacing: 20) {
                 HStack(spacing: 20) {
-                    Button(action: {
-                        // Setting button action
-                        isSettingClicked.toggle()
-                    }) {
-                        VStack {
-                            Image(systemName: "gearshape")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 30, height: 30)
-                                .padding(20)
-                                .background(
-                                    Circle()
-                                        .fill(isSettingClicked ? selectedButtonColor : Color.clear) // Change color when clicked
-                                        .overlay(
-                                            Circle()
-                                                .stroke(Color.gray, lineWidth: 2)  // Circle stroke
-                                                .shadow(radius: 5)  // Circle shadow
-                                    )
-                                )
-                            Text("SETTING")
-                        }
-                        .fontWeight(.bold)
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
-                        .frame(width: 180)
-                        }
-
-                    Button(action: {
-                        // Log Out button action
-                        isLogOutClicked.toggle()
-                    }) {
-                        VStack {
-                            Image(systemName: "arrowshape.turn.up.left")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 30, height: 30)
-                                .padding(20)
-                                .background(
-                                    Circle()
-                                        .fill(isLogOutClicked ? selectedButtonColor : Color.clear) // Change color when clicked
-                                        .overlay(
-                                            Circle()
-                                                .stroke(Color.gray, lineWidth: 2)  // Circle stroke
-                                                .shadow(radius: 5)  // Circle shadow
-                                    )
-                                )
-                            Text("LOG OUT")
-                        }
-                        .fontWeight(.bold)
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
-                        .frame(width: 180)
-                        }
-                    }
-                
-                // Edit Profile button centered
-                Button(action: {
-                    // Edit Profile button action
-                    isEditProfileClicked.toggle()
-                }) {
-                    VStack {
-                        Image(systemName: "pencil")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 35, height: 35)
-                            .padding(25)
-                            .background(
-                                Circle()
-                                    .fill(isEditProfileClicked ? selectedButtonColor : Color.clear) // Change color when clicked
-                                    .overlay(
-                                        Circle()
-                                            .stroke(Color.gray, lineWidth: 2)  // Circle stroke
-                                            .shadow(radius: 5)  // Circle shadow
-                                    )
-                            )
-                        Text("EDIT PROFILE")
-                    }
-                    .fontWeight(.bold)
-                    .font(.subheadline)
-                    .foregroundColor(.gray)
-                    .frame(width: 200)
+                    ProfileButton(
+                        icon: "settings_icon",
+                        label: "SETTINGS",
+                        isSelected: isSettingClicked,
+                        action: { isSettingClicked.toggle() }
+                    )
+                    ProfileButton(
+                        icon: "logout_icon",
+                        label: "LOGOUT",
+                        isSelected: isLogOutClicked,
+                        action: { isLogOutClicked.toggle() }
+                    )
                 }
+                ProfileButton(
+                    icon: "edit_icon",
+                    label: "EDIT PROFILE",
+                    isSelected: isEditProfileClicked,
+                    action: { isEditProfileClicked.toggle() }
+                )
             }
             .padding(.bottom, 40)
 
