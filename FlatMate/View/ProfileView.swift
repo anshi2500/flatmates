@@ -1,5 +1,5 @@
 //
-//  MyProfileView.swift
+//  ProfileView.swift
 //  FlatMate
 //
 //  Created by Jingke Huang on 2024-10-22.
@@ -10,12 +10,12 @@ import SwiftUI
 struct ProfileView: View {
     var userName: String = "John"
     var userAge: Int = 25
-    
-    // Add those variables for the next step: Adding logic
+
+    // State variables for handling button clicks
     @State private var isSettingClicked = false
     @State private var isEditProfileClicked = false
     @State private var isLogOutClicked = false
-    
+
     var body: some View {
         NavigationView {
             VStack {
@@ -25,7 +25,8 @@ struct ProfileView: View {
                     .scaledToFit()
                     .frame(height: 103)
                     .padding(.bottom, 20)
-                
+
+                // Profile Image
                 Image("profileImage")
                     .resizable()
                     .aspectRatio(contentMode: .fill)
@@ -34,14 +35,15 @@ struct ProfileView: View {
                     .padding(.top, 20)
                     .padding(.bottom, 5)
                     .shadow(radius: 10)
-                    
+
+                // User Details
                 Text("\(userName), \(userAge)")
                     .font(.title)
                     .fontWeight(.bold)
 
                 Spacer()
-                
-                // Reuse ProfileButton Component for Settings, Edit Profile, Logout
+
+                // Reuse ProfileButton for Settings, Edit Profile, Logout
                 VStack(spacing: 20) {
                     HStack(spacing: 20) {
                         ProfileButton(
@@ -61,7 +63,7 @@ struct ProfileView: View {
                         icon: "edit_icon",
                         label: "EDIT PROFILE",
                         isSelected: isEditProfileClicked,
-                        action: { isEditProfileClicked.toggle() }
+                        action: { isEditProfileClicked = true } // Navigate to EditProfileView
                     )
                 }
                 .padding(.bottom, 40)
@@ -69,7 +71,11 @@ struct ProfileView: View {
                 Spacer()
             }
             .navigationBarBackButtonHidden(true) // Hide default back button
-            // Add .navigationDestination for logout
+            // Add .navigationDestination for Edit Profile
+            .navigationDestination(isPresented: $isEditProfileClicked) {
+                EditProfileView()
+            }
+            // Add .navigationDestination for Logout
             .navigationDestination(isPresented: $isLogOutClicked) {
                 LoginView()
             }
