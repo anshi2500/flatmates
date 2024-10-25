@@ -7,11 +7,22 @@
 
 import SwiftUI
 
+struct InputFieldStyle: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .font(.custom("Outfit-ExtraLight", size: 17))
+            .foregroundColor(.black)
+            .padding(.all, 12)
+            .background(Color("primaryBackground"))
+            .cornerRadius(10)
+    }
+}
+
 struct InputView: View {
     @Binding var text: String
     let title: String
     let placeholder: String
-    var isSecureField = false
+    var isSecureField: Bool
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -19,13 +30,10 @@ struct InputView: View {
                 .font(.custom("Outfit-ExtraLight", size: 17))
                 .padding(.bottom, -5)
             
-            TextField(placeholder, text: $text)
-                .font(.custom("Outfit-ExtraLight", size: 17))
-                .padding(.all, 12)
-                .background(Color("primaryBackground")) // Using the custom color
-                .cornerRadius(10) // Rounded corners
-
-                .foregroundColor(.white)
+            // Ternary operator to decide between SecureField and TextField
+            (isSecureField ? AnyView(SecureField(placeholder, text: $text))
+                           : AnyView(TextField(placeholder, text: $text)))
+                .modifier(InputFieldStyle())
         }
         .frame(maxWidth: .infinity, minHeight: 48) // Adjusted frame
         .padding(.bottom, 20)
@@ -33,5 +41,6 @@ struct InputView: View {
 }
 
 #Preview {
-    InputView(text: .constant(""), title: "Email Address", placeholder: "name@example.com")
+    InputView(text: .constant(""), title: "Email Address", placeholder: "name@example.com", isSecureField: false)
+    InputView(text: .constant(""), title: "Password", placeholder: "***********", isSecureField: true)
 }
