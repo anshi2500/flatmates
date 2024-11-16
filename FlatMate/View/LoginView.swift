@@ -12,6 +12,8 @@ struct LoginView: View {
     @State private var email = ""
     @State private var password = ""
     @State private var errorMessage: String?
+    @State private var navigateToResetPassword = false
+    @State private var resetEmail = ""
     @EnvironmentObject var viewModel: AuthViewModel
 
     var body: some View {
@@ -23,13 +25,13 @@ struct LoginView: View {
                     .scaledToFit()
                     .frame(height: 103)
                     .padding(.bottom, 20)
-
+                
                 // Welcome Text
                 Text("Welcome Back")
                     .font(.custom("Outfit-Bold", size: 28))
                     .multilineTextAlignment(.center)
                     .padding(.vertical, 20)
-
+                
                 // Input Fields
                 VStack {
                     InputView(text: $email, title: "Email Address", placeholder: "name@example.com", isSecureField: false)
@@ -44,15 +46,18 @@ struct LoginView: View {
                             .padding(.bottom, 10)
                     }
                     
-                    // Use ButtonView for "forget password" link button
                     HStack {
                         Spacer()
-                        ButtonView(title: "Forgot Password?", action:{}, type: .link)
-                            .padding(.top, errorMessage == nil ? 30 : 5) // Dynamic padding
+                        ButtonView(title: "Forgot Password?", action: {
+                            navigateToResetPassword = true
+                        }, type: .link)
                     }
-                    .padding(.top, -20)
+                    .padding(.top, errorMessage == nil ? 20 : 5)
                     .padding(.bottom, 20)
-                   
+                    .navigationDestination(isPresented: $navigateToResetPassword) {
+                        ResetPasswordView().environmentObject(viewModel)
+                    }
+                    
                     // Use ButtonView for the Log In button
                     ButtonView(title: "Log In", action: { Task {
                         do {
@@ -61,11 +66,11 @@ struct LoginView: View {
                             // Firebase-specific error handling
                             if let authError = AuthErrorCode(rawValue: error.code) {
                                 switch authError {
-                                    case .invalidEmail:
-                                        self.errorMessage = "The email address is invalid."
-                                    default:
-                                        self.errorMessage = "Wrong credentials. Please try again."
-                                    }
+                                case .invalidEmail:
+                                    self.errorMessage = "The email address is invalid."
+                                default:
+                                    self.errorMessage = "Wrong credentials. Please try again."
+                                }
                             } else {
                                 // Fallback if the error is not an AuthErrorCode
                                 self.errorMessage = "An unexpected error occurred. Please contact support."
@@ -74,15 +79,15 @@ struct LoginView: View {
                     }})
                 }
                 .padding(.horizontal, 20)
-
+                
                 Spacer()
-
+                
                 // Sign Up Section
                 HStack {
                     Text("Don't have an account?")
                         .font(.custom("Outfit-Regular", size: 17))
                         .foregroundColor(.primary)
-
+                    
                     NavigationLink(destination: SignupView().navigationBarBackButtonHidden(true)) {
                         Text("Register")
                             .font(.custom("Outfit-Bold", size: 17))

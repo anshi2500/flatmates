@@ -55,11 +55,12 @@ class AuthViewModel: ObservableObject {
         }
     }
     
-    func deleteAccount() {
-        
-    }
-    
-    func fetchUser() async {
-         
+    func sendPasswordReset(toEmail email: String) async throws {
+        do {
+            try await Auth.auth().sendPasswordReset(withEmail: email)
+        } catch {
+            print("DEBUG: Failed to send password reset with error \(error.localizedDescription)")
+            throw error // Propagate the error for the caller to handle
+        }
     }
 }
