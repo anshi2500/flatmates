@@ -6,11 +6,13 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 struct LoginView: View {
     @State private var email = ""
     @State private var password = ""
-    @State private var isLoginActive = false // State to manage navigation
+    @State private var errorMessage: String?
+    @EnvironmentObject var viewModel: AuthViewModel
 
     var body: some View {
         NavigationView {
@@ -32,16 +34,44 @@ struct LoginView: View {
                 VStack {
                     InputView(text: $email, title: "Email Address", placeholder: "name@example.com", isSecureField: false)
                     InputView(text: $password, title: "Password", placeholder: "***************", isSecureField: true)
+                    
+                    // Error Message Display
+                    if let errorMessage = errorMessage {
+                        Text(errorMessage)
+                            .font(.custom("Outfit-Regular", size: 14))
+                            .foregroundColor(.red)
+                            .frame(maxWidth: .infinity, alignment: .leading) // Aligns the text to the left
+                            .padding(.bottom, 10)
+                    }
+                    
                     // Use ButtonView for "forget password" link button
                     HStack {
                         Spacer()
                         ButtonView(title: "Forgot Password?", action:{}, type: .link)
+                            .padding(.top, errorMessage == nil ? 30 : 5) // Dynamic padding
                     }
                     .padding(.top, -20)
                     .padding(.bottom, 20)
                    
                     // Use ButtonView for the Log In button
-                    ButtonView(title: "Log In", action: {isLoginActive = true})
+                    ButtonView(title: "Log In", action: { Task {
+                        do {
+                            try await viewModel.signIn(withEmail: email, password: password)
+                        } catch let error as NSError {
+                            // Firebase-specific error handling
+                            if let authError = AuthErrorCode(rawValue: error.code) {
+                                switch authError {
+                                    case .invalidEmail:
+                                        self.errorMessage = "The email address is invalid."
+                                    default:
+                                        self.errorMessage = "Wrong credentials. Please try again."
+                                    }
+                            } else {
+                                // Fallback if the error is not an AuthErrorCode
+                                self.errorMessage = "An unexpected error occurred. Please contact support."
+                            }
+                        }
+                    }})
                 }
                 .padding(.horizontal, 20)
 
@@ -64,10 +94,6 @@ struct LoginView: View {
             }
             .padding(.horizontal, 20)
             .navigationBarHidden(true)
-            // Add .navigationDestination here
-            .navigationDestination(isPresented: $isLoginActive) {
-                MainView()
-            }
         }
     }
 }

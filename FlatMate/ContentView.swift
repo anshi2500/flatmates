@@ -8,10 +8,18 @@
 import SwiftUI
 
 struct ContentView: View {
+    @EnvironmentObject var viewModel: AuthViewModel
+    
     var body: some View {
-        NavigationStack {
-            // Entry point of the app
-            LandingPageView()
+        Group {
+            if viewModel.userSession != nil {
+                MainView()
+            } else {
+                NavigationStack {
+                    // Entry point of the app
+                    LandingPageView()
+                }
+            }
         }
     }
 }
