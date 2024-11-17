@@ -66,7 +66,7 @@ struct LandingPageView: View {
                 .padding(.horizontal, 30)
                 // Use the new navigationDestination method
                 .navigationDestination(isPresented: $isComplete) {
-                    OnboardingPageView().navigationBarBackButtonHidden(true)
+                    LoginView().navigationBarBackButtonHidden(true)
                 }
             }
         }
