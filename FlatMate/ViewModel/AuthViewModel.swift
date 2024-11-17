@@ -17,6 +17,7 @@ protocol AuthenticationFormProtocol {
 class AuthViewModel: ObservableObject {
     @Published var userSession: FirebaseAuth.User?
     @Published var currentUser: User?
+    @Published var hasCompletedOnboarding: Bool = false
     
     init() {
         self.userSession = Auth.auth().currentUser
@@ -36,7 +37,7 @@ class AuthViewModel: ObservableObject {
         do {
             let result = try await Auth.auth().createUser(withEmail: email, password: password)
             self.userSession = result.user
-            let user = User(id: result.user.uid, email: email, username: username)
+            let user = User(id: result.user.uid, email: email, username: username, hasCompletedOnboarding: false)
             let encodedUser = try Firestore.Encoder().encode(user)
             try await Firestore.firestore().collection("users").document(user.id).setData(encodedUser)
         } catch {
@@ -61,6 +62,30 @@ class AuthViewModel: ObservableObject {
         } catch {
             print("DEBUG: Failed to send password reset with error \(error.localizedDescription)")
             throw error // Propagate the error for the caller to handle
+        }
+    }
+    
+    func fetchUser() async throws {
+        guard let uid = userSession?.uid else { return }
+        do {
+            let snapshot = try await Firestore.firestore().collection("users").document(uid).getDocument()
+            if let data = snapshot.data() {
+                self.currentUser = try Firestore.Decoder().decode(User.self, from: data)
+                self.hasCompletedOnboarding = self.currentUser?.hasCompletedOnboarding ?? false
+            }
+        } catch {
+            print("DEBUG: Failed to fetch user data with error \(error.localizedDescription)")
+        }
+    }
+    
+    func completeOnboarding() async throws {
+        guard let uid = userSession?.uid else { return }
+        do {
+            try await Firestore.firestore().collection("users").document(uid).updateData(["hasCompletedOnboarding": true])
+            self.hasCompletedOnboarding = true
+        } catch {
+            print("DEBUG: Failed to update onboarding status with error \(error.localizedDescription)")
+            throw error
         }
     }
 }

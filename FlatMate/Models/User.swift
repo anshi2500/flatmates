@@ -11,4 +11,5 @@ struct User: Identifiable, Codable {
     let id: String
     let email: String
     let username: String
+    let hasCompletedOnboarding: Bool
 }
