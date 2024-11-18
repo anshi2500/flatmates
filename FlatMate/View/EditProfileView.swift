@@ -26,26 +26,36 @@ struct EditProfileView: View {
     var body: some View {
         NavigationView {
             ScrollView {
-                VStack(alignment: .leading, spacing: 17) {
+                VStack(alignment: .leading, spacing: 15) {
+                    Spacer()
+                    Text("Edit Profile")
+                        .font(.custom("Outfit-Bold", size: 28))
+                    Divider()
+                    
                     // Profile Picture
                     HStack {
-                        
-                        VStack{
-                            Circle()
-                                .fill(Color.gray)
-                                .frame(width: 80, height: 80)
-                            
-                            Button("+"){
+                        VStack {
+                            ZStack {
+                                // Profile Circle
+                                Circle()
+                                    .fill(Color.gray)
+                                    .frame(width: 100, height: 100)
                                 
+                                // Plus Button
+                                Button(action: {}) {
+                                    Image(systemName: "plus")
+                                        .font(.system(size: 15, weight: .bold))
+                                        .foregroundColor(.white)
+                                        .frame(width: 30, height: 30)
+                                        .background(Circle().fill(Color("primary")))
+                                        .shadow(radius: 5)
+                                }
+                                .offset(x: 35, y: 35) // Adjust positioning to match the right layout
                             }
-                            .frame(maxWidth: 20, maxHeight: 20)
-                            .background(Color.gray)
-                            .cornerRadius(20)
                         }
-                        
+                        .padding(.trailing, 10)
                         // First Name, Last Name, Age
                         VStack(alignment: .leading) {
-                            
                             HStack{
                                 Text("First Name")
                                     .font(.custom("Outfit-Bold", fixedSize:15))
@@ -53,7 +63,6 @@ struct EditProfileView: View {
                                     .textFieldStyle(.automatic)
                             }
                             Divider()
-                            
                             HStack{
                                 Text("Last Name")
                                     .font(.custom("Outfit-Bold", fixedSize:15))
@@ -61,14 +70,12 @@ struct EditProfileView: View {
                                     .textFieldStyle(.automatic)
                             }
                             Divider()
-                            
                             HStack{
                                 Text("Age")
                                     .font(.custom("Outfit-Bold", fixedSize:15))
                                 TextField("", text: $age)
                                     .keyboardType(.numberPad)
                                     .textFieldStyle(.automatic)
-                                
                             }
                             Divider()
                         }
@@ -100,7 +107,7 @@ struct EditProfileView: View {
                     // Smoker Toggle
                     Toggle("  I am a smoker.", isOn: $isSmoker)
                         .font(.custom("Outfit-Bold", fixedSize:15))
-           
+                    Divider()
                     // Pets Allowed Toggle
                     Toggle("  I am a pet owner.", isOn: $pets)
                         .font(.custom("Outfit-Bold", fixedSize:15))
@@ -117,7 +124,6 @@ struct EditProfileView: View {
                         }
                         .pickerStyle(SegmentedPickerStyle())
                     }
-              
                     
                     // Guest Frequency
                     VStack(alignment: .leading) {
@@ -142,21 +148,16 @@ struct EditProfileView: View {
                             Text("Loud")
                         }
                     }
-                   
                     
                     // Buttons
                     HStack {
                         ButtonView(title: "Update Profile", action: {})
-                             .padding(.horizontal, 16)
-                               .font(.custom("Outfit-Bold", fixedSize:15))
-                               .padding(10)
-                        
+                            .font(.custom("Outfit-Bold", fixedSize:15))
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, -10)
                     }
                     .offset(y: -7)
-                    
                 }
-                .navigationBarTitle("Edit Profile", displayMode: .large)
-                
             }
             .padding(.horizontal, 25)
         }
@@ -167,4 +168,8 @@ struct EditProfileView: View {
             EditProfileView()
         }
     }
+}
+
+#Preview {
+    EditProfileView()
 }
