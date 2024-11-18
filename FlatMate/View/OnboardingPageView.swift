@@ -17,7 +17,7 @@ struct OnboardingPageView: View {
     @State private var gender = ""
     @State private var bio = ""
     @State private var roomState = ""
-    @State private var smoker = false
+    @State private var isSmoker = false
     @State private var petsOk = false
     @State private var noise = 0.0
     @State private var partyFreq = ""
@@ -76,7 +76,7 @@ struct OnboardingPageView: View {
                     ProgrammaticInput(
                         id: "smoker", type: .toggle, label: "Is a Smoker",
                         stringValue: $unusedString, dateValue: $unusedDate,
-                        booleanValue: $smoker, doubleValue: $unusedDouble),
+                        booleanValue: $isSmoker, doubleValue: $unusedDouble),
                     ProgrammaticInput(
                         id: "petsOk", type: .toggle, label: "Has Pets",
                         stringValue: $unusedString, dateValue: $unusedDate,
@@ -115,7 +115,7 @@ struct OnboardingPageView: View {
             "gender": gender,
             "bio": bio,
             "roomState": roomState,
-            "smoker": smoker,
+            "isSmoker": isSmoker,
             "petsOk": petsOk,
             "noise": noise,
             "partyFreq": partyFreq,

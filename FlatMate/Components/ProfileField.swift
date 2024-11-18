@@ -8,11 +8,18 @@
 import SwiftUI
 
 struct ProfileField: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
-    }
-}
+    let title: String
+    @Binding var text: String
+    var keyboardType: UIKeyboardType = .default
 
-#Preview {
-    ProfileField()
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title)
+                .font(.headline)
+            TextField(title, text: $text)
+                .keyboardType(keyboardType)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+        }
+        .padding(.vertical, 5)
+    }
 }
