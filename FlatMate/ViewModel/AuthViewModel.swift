@@ -22,12 +22,14 @@ class AuthViewModel: ObservableObject {
     
     init() {
         self.userSession = Auth.auth().currentUser
+        Task { await fetchUser() }
     }
     
     func signIn(withEmail email: String, password: String) async throws {
         do {
             let result = try await Auth.auth().signIn(withEmail: email, password: password)
             self.userSession = result.user
+            await fetchUser()
         } catch {
             print("DEBUG: Failed to log in with error \(error.localizedDescription)")
             throw error // Propogate the error to the caller
@@ -41,6 +43,7 @@ class AuthViewModel: ObservableObject {
             let user = User(id: result.user.uid, email: email, username: username, hasCompletedOnboarding: false)
             let encodedUser = try Firestore.Encoder().encode(user)
             try await Firestore.firestore().collection("users").document(user.id).setData(encodedUser)
+            self.currentUser = user
         } catch {
             print("DEBUG: Failed to create user with error \(error.localizedDescription)")
             throw error // Propagate the error
@@ -66,7 +69,7 @@ class AuthViewModel: ObservableObject {
         }
     }
     
-    func fetchUser() async throws {
+    func fetchUser() async {
         guard let uid = userSession?.uid else { return }
         do {
             let snapshot = try await Firestore.firestore().collection("users").document(uid).getDocument()
