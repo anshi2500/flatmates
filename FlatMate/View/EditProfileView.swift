@@ -151,7 +151,7 @@ struct EditProfileView: View {
                     
                     // Buttons
                     HStack {
-                        ButtonView(title: "Update Profile", action: {})
+                        ButtonView(title: "Update", action: {})
                             .font(.custom("Outfit-Bold", fixedSize:15))
                             .padding(.horizontal, 16)
                             .padding(.vertical, -10)
