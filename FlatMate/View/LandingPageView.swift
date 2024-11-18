@@ -1,10 +1,10 @@
 import SwiftUI
 
 private let onboardingSteps = [
-    LandingPageStep(imageName: "landingPageImage-1", title: "Live with like-minded people.", description: "It’s easier than you think."),
-    LandingPageStep(imageName: "landingPageImage-2", title: "Your Perfect Roommate is a Swipe Away", description: "Swipe right to like, left to pass. It’s that simple!"),
-    LandingPageStep(imageName: "landingPageImage-3", title: "Say Goodbye to Roommate Drama", description: "Find roommates who share your habits and lifestyle choices."),
-    LandingPageStep(imageName: "landingPageImage-4", title: "Meet Your Perfect Roommate Today", description: "FlatMate makes it easy to find the right person, fast.")
+    LandingPageStep(imageName: "landing1", title: "Live with like-minded people.", description: "It’s easier than you think."),
+    LandingPageStep(imageName: "landing2", title: "Your Perfect Roommate is a Swipe Away", description: "Swipe right to like, left to pass. It’s that simple!"),
+    LandingPageStep(imageName: "landing3", title: "Say Goodbye to Roommate Drama", description: "Find roommates who share your habits and lifestyle choices."),
+    LandingPageStep(imageName: "landing4", title: "Meet Your Perfect Roommate Today", description: "FlatMate makes it easy to find the right person, fast.")
 ]
 
 struct LandingPageView: View {
@@ -14,11 +14,13 @@ struct LandingPageView: View {
     var body: some View {
         NavigationStack {
             VStack {
-                Image("Logo")
+                Image("Logo Straight Blue")
                     .resizable()
                     .scaledToFit()
                     .frame(height: 103)
-                    .padding(.bottom, 20)
+                    .padding(.top, 15)
+                    .padding(.bottom, 15)
+                    .padding(.horizontal, 35)
 
                 // Use the array-based ForEach
                 TabView(selection: $currentStep) {
