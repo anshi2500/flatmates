@@ -1,4 +1,5 @@
 import SwiftUI
+import FirebaseFirestore
 
 struct OnboardingPageView: View {
     @State private var currentStep = 0
@@ -21,6 +22,8 @@ struct OnboardingPageView: View {
     @State private var noise = 0.0
     @State private var partyFreq = ""
     @State private var guestFreq = ""
+    @EnvironmentObject var viewModel: AuthViewModel
+    var onComplete: () -> Void
 
     private var onboardingSteps: [OnboardingPage] {
         [
@@ -102,13 +105,29 @@ struct OnboardingPageView: View {
                 ]),
         ]
     }
-
+    
     func handleSubmit() {
-        print("Submitted!")
-        print(
-            "First Name: \(firstName)", "Last Name: \(lastName)", "DOB: \(dob)", "Gender: \(gender)",
-            "Bio: \(bio)", "Room State: \(roomState)", "Smoker: \(smoker)", "Pets OK: \(petsOk)",
-            "Noise: \(noise)", "Party Freq: \(partyFreq)", "Guest Freq: \(guestFreq)")
+        guard let userID = viewModel.userSession?.uid else { return }
+        let data: [String: Any] = [
+            "firstName": firstName,
+            "lastName": lastName,
+            "dob": dob,
+            "gender": gender,
+            "bio": bio,
+            "roomState": roomState,
+            "smoker": smoker,
+            "petsOk": petsOk,
+            "noise": noise,
+            "partyFreq": partyFreq,
+            "guestFreq": guestFreq
+        ]
+        Firestore.firestore().collection("users").document(userID).updateData(data) { error in
+            if let error = error {
+                print("DEBUG: Failed to save onboarding data with error \(error.localizedDescription)")
+            } else {
+                onComplete()
+            }
+        }
     }
 
     func isStepComplete() -> Bool {
@@ -168,8 +187,4 @@ struct OnboardingPageView: View {
             .padding()
         }
     }
-}
-
-#Preview {
-    OnboardingPageView()
 }

@@ -12,11 +12,18 @@ struct ContentView: View {
     
     var body: some View {
         Group {
-            if viewModel.userSession != nil {
-                MainView()
+            if let userSession = viewModel.userSession {
+                if viewModel.hasCompletedOnboarding {
+                    MainView()
+                } else {
+                    OnboardingPageView(onComplete: {
+                        Task {
+                            try? await viewModel.completeOnboarding()
+                        }
+                    })
+                }
             } else {
                 NavigationStack {
-                    // Entry point of the app
                     LandingPageView()
                 }
             }
