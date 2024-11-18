@@ -8,6 +8,7 @@
 import Foundation
 import FirebaseAuth
 import FirebaseFirestore
+import FirebaseStorage
 
 protocol AuthenticationFormProtocol {
     var formIsValid: Bool { get }
@@ -85,6 +86,68 @@ class AuthViewModel: ObservableObject {
             self.hasCompletedOnboarding = true
         } catch {
             print("DEBUG: Failed to update onboarding status with error \(error.localizedDescription)")
+            throw error
+        }
+    }
+    
+    func updateProfile(
+        firstname: String,
+        lastname: String,
+        age: String,
+        bio: String,
+        isSmoker: Bool,
+        pets: Bool,
+        gender: String,
+        partyFrequency: String,
+        guestFrequency: String,
+        noiseTolerance: Double,
+        profileImage: UIImage?
+    ) async throws {
+        guard let uid = userSession?.uid else { throw NSError(domain: "AuthError", code: 401, userInfo: [NSLocalizedDescriptionKey: "User not logged in"]) }
+
+        var updatedData: [String: Any] = [
+            "firstName": firstname,
+            "lastName": lastname,
+            "age": age,
+            "bio": bio,
+            "isSmoker": isSmoker,
+            "pets": pets,
+            "gender": gender,
+            "partyFrequency": partyFrequency,
+            "guestFrequency": guestFrequency,
+            "noiseTolerance": noiseTolerance
+        ]
+
+        do {
+            // Upload profile image if available
+            if let profileImage = profileImage, let imageData = profileImage.jpegData(compressionQuality: 0.8) {
+                let storageRef = Storage.storage().reference().child("profile_images/\(uid).jpg")
+                let _ = try await storageRef.putDataAsync(imageData)
+                let downloadURL = try await storageRef.downloadURL()
+                updatedData["profileImageURL"] = downloadURL.absoluteString
+            }
+
+            // Update Firestore document
+            try await Firestore.firestore().collection("users").document(uid).updateData(updatedData)
+
+            // Update local `currentUser` with the new data
+            if var currentUser = self.currentUser {
+                currentUser.firstName = firstname
+                currentUser.lastName = lastname
+                currentUser.age = age
+                currentUser.bio = bio
+                currentUser.isSmoker = isSmoker
+                currentUser.pets = pets
+                currentUser.gender = gender
+                currentUser.partyFrequency = partyFrequency
+                currentUser.guestFrequency = guestFrequency
+                currentUser.noiseTolerance = noiseTolerance
+                if let profileImageURL = updatedData["profileImageURL"] as? String {
+                    currentUser.profileImageURL = profileImageURL
+                }
+                self.currentUser = currentUser
+            }
+        } catch {
             throw error
         }
     }

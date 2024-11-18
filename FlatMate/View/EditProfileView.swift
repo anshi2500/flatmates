@@ -7,6 +7,9 @@
 //
 
 import SwiftUI
+import FirebaseFirestore
+import FirebaseStorage
+
 
 let genders = ["Female", "Male", "Non-binary", "Other"]
 let frequencies = ["Never", "Sometimes", "Always"]
@@ -22,6 +25,10 @@ struct EditProfileView: View {
     @State private var selectedPartyFrequency: String = frequencies[0]
     @State private var selectedGuestFrequency: String = frequencies[0]
     @State private var noiseTolerance: Double = 0.0 // Range from 0.0 to 1.0
+    @State private var profileImage: UIImage? = nil
+    @State private var isImagePickerPresented = false
+    @State private var errorMessage: String?
+    @EnvironmentObject var viewModel: AuthViewModel
 
     var body: some View {
         NavigationView {
@@ -36,13 +43,17 @@ struct EditProfileView: View {
                     HStack {
                         VStack {
                             ZStack {
-                                // Profile Circle
-                                Circle()
-                                    .fill(Color.gray)
-                                    .frame(width: 100, height: 100)
-                                
-                                // Plus Button
-                                Button(action: {}) {
+                                if let image = profileImage {
+                                    Image(uiImage: image)
+                                        .resizable()
+                                        .clipShape(Circle())
+                                        .frame(width: 100, height: 100)
+                                } else {
+                                    Circle()
+                                        .fill(Color.gray)
+                                        .frame(width: 100, height: 100)
+                                }
+                                Button(action: { isImagePickerPresented = true }) {
                                     Image(systemName: "plus")
                                         .font(.system(size: 15, weight: .bold))
                                         .foregroundColor(.white)
@@ -50,7 +61,7 @@ struct EditProfileView: View {
                                         .background(Circle().fill(Color("primary")))
                                         .shadow(radius: 5)
                                 }
-                                .offset(x: 35, y: 35) // Adjust positioning to match the right layout
+                                .offset(x: 35, y: 35)
                             }
                         }
                         .padding(.trailing, 10)
@@ -151,15 +162,40 @@ struct EditProfileView: View {
                     
                     // Buttons
                     HStack {
-                        ButtonView(title: "Update", action: {})
-                            .font(.custom("Outfit-Bold", fixedSize:15))
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, -10)
+                        ButtonView(title: "Update", action: {
+                            Task {
+                                do {
+                                    try await viewModel.updateProfile(
+                                        firstname: firstname,
+                                        lastname: lastname,
+                                        age: age,
+                                        bio: bio,
+                                        isSmoker: isSmoker,
+                                        pets: pets,
+                                        gender: selectedGender,
+                                        partyFrequency: selectedPartyFrequency,
+                                        guestFrequency: selectedGuestFrequency,
+                                        noiseTolerance: noiseTolerance,
+                                        profileImage: profileImage
+                                    )
+                                    print("Profile updated successfully")
+                                } catch {
+                                    print("Failed to update profile: \(error)")
+                                    errorMessage = "Failed to update profile. Please try again."
+                                }
+                            }
+                        })
+                        .font(.custom("Outfit-Bold", fixedSize:15))
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, -10)
                     }
                     .offset(y: -7)
                 }
             }
             .padding(.horizontal, 25)
+            .sheet(isPresented: $isImagePickerPresented) {
+                
+            }
         }
     }
     
