@@ -9,14 +9,20 @@
 
 import SwiftUI
 
+//TODO Remove below and make it generic
+let receiver = "0"
+let sender = "1"
+
 struct MessagingView: View {
     // An array that stores temporary messages. Use this array in the future to add to chatUI from database.
-    @State private var messageArray: [Message] = [
-        Message(id: "1", text: "Hello there!", received: true, timestamp: Date()),
+    @State private var messageArray: [Message] = []
+        /*Message(id: "1", text: "Hello there!", received: true, timestamp: Date()),
         Message(id: "2", text: "How's it going?", received: false, timestamp: Date()),
         Message(id: "3", text: "Not bad, thanks! And you?", received: true, timestamp: Date())
-    ]
+    ]*/
     @State private var newMessageText: String = ""
+    
+    let messageManager = MessageManager()
 
     var body: some View {
         VStack {
@@ -46,19 +52,24 @@ struct MessagingView: View {
 
             // Message input field
             MessageField(message: $newMessageText, messages: $messageArray, onSend: { text in
-                sendMessage(text: text)
+                messageManager.sendMessage(
+                    chatID: "ExampleID",
+                    senderID: "ExampleSender",
+                    receiverID: "ExampleReceiver",
+                    messageText: text
+                ) { result in
+                    switch result {
+                    case .success:
+                        print("Message sent successfully")
+                    case .failure:
+                        print("Error sending message")
+                    }
+                }
             })
         }
         .background(Color("Gray"))
     }
-
-    //TODO: sendMessage should create a new field in firebase
-    private func sendMessage(text: String) {
-        guard !text.isEmpty else { return }
-        // Add the new message to the array
-        let newMessage = Message(id: UUID().uuidString, text: text, received: false, timestamp: Date())
-        messageArray.append(newMessage)
-    }
+    
 }
 
 // Preview for MessagingView

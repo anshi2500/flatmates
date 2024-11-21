@@ -9,7 +9,10 @@ import Foundation
 
 struct Message: Identifiable, Equatable {
     let id: String
+    let senderID: String
+    let receiverID: String
     let text: String
-    let received: Bool
+    let read: Bool
     let timestamp: Date
+    
 }
