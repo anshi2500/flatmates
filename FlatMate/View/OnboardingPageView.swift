@@ -20,8 +20,8 @@ struct OnboardingPageView: View {
     @State private var isSmoker = false
     @State private var petsOk = false
     @State private var noise = 0.0
-    @State private var partyFreq = ""
-    @State private var guestFreq = ""
+    @State private var partyFrequency = ""
+    @State private var guestFrequency = ""
     @EnvironmentObject var viewModel: AuthViewModel
     var onComplete: () -> Void
 
@@ -94,12 +94,12 @@ struct OnboardingPageView: View {
                 inputs: [
                     ProgrammaticInput(
                         id: "partyFreq", type: .picker, label: "How often do you have parties",
-                        stringValue: $partyFreq, dateValue: $unusedDate,
+                        stringValue: $partyFrequency, dateValue: $unusedDate,
                         booleanValue: $unusedBoolean, doubleValue: $unusedDouble,
                         pickerOptions: frequencies),
                     ProgrammaticInput(
                         id: "guestFreq", type: .picker, label: "How often do you have guests",
-                        stringValue: $guestFreq, dateValue: $unusedDate,
+                        stringValue: $guestFrequency, dateValue: $unusedDate,
                         booleanValue: $unusedBoolean, doubleValue: $unusedDouble,
                         pickerOptions: frequencies),
                 ]),
@@ -118,8 +118,8 @@ struct OnboardingPageView: View {
             "isSmoker": isSmoker,
             "petsOk": petsOk,
             "noise": noise,
-            "partyFreq": partyFreq,
-            "guestFreq": guestFreq
+            "partyFrequency": partyFrequency,
+            "guestFrequency": guestFrequency
         ]
         Firestore.firestore().collection("users").document(userID).updateData(data) { error in
             if let error = error {
@@ -142,7 +142,7 @@ struct OnboardingPageView: View {
             case 3:
                 return true
             case 4:
-                return partyFreq != "" && guestFreq != ""
+                return partyFrequency != "" && guestFrequency != ""
             default:
                 return false
         }
