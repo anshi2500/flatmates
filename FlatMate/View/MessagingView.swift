@@ -13,14 +13,14 @@ struct MessagingView: View {
     @StateObject var viewModel: MessageViewModel // Dynamically created with currentUserID
     var chatID: String
     var currentUserID: String
-    var receiverID: String
+    var otherUserID: String
 
     @State private var newMessageText: String = ""
 
-    init(chatID: String, currentUserID: String, receiverID: String) {
+    init(chatID: String, currentUserID: String, otherUserID: String) {
         self.chatID = chatID
         self.currentUserID = currentUserID
-        self.receiverID = receiverID
+        self.otherUserID = otherUserID
         _viewModel = StateObject(wrappedValue: MessageViewModel())
     }
 
@@ -60,7 +60,7 @@ struct MessagingView: View {
                 viewModel.sendMessage(
                     chatID: chatID,
                     senderID: currentUserID,
-                    receiverID: receiverID,
+                    receiverID: otherUserID,
                     messageText: text
                 )
             }
@@ -76,5 +76,5 @@ struct MessagingView: View {
 
 // Preview for MessagingView
 #Preview {
-    MessagingView(chatID: "Test", currentUserID: "ruI196nXC1e06whgCwpBJiwOnNX2", receiverID: "1")
+    MessagingView(chatID: "Test", currentUserID: "ruI196nXC1e06whgCwpBJiwOnNX2", otherUserID: "1")
 }
