@@ -9,16 +9,15 @@ import SwiftUI
 
 struct MessageField: View {
     @Binding var message: String
-    @Binding var messages: [Message]
-    var onSend: (String) -> Void // Passes the message text to the parent view
-    
+    var onSend: (String) -> Void // Notify parent to handle sending logic
+
     var body: some View {
         HStack {
             CustomTextField(placeholder: Text("Enter your message here"), text: $message)
             Button {
                 if !message.isEmpty {
-                    onSend(message) // Notify parent view to handle the message sending logic
-                    message = "" // Clear the text field
+                    onSend(message) // Send the message to the parent view
+                    message = "" // Clear the text field after sending
                 }
             } label: {
                 Image(systemName: "paperplane.fill")
@@ -28,6 +27,7 @@ struct MessageField: View {
                     .cornerRadius(50)
             }
         }
+        .animation(.easeInOut, value: message.isEmpty)
         .padding(.horizontal)
         .padding(.vertical, 10)
         .background(Color("chatSecondary"))
