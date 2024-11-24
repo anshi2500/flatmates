@@ -8,14 +8,21 @@
 // TODO: Change colours to match UI. Was not sure about colour choice as our theme is pretty dark.
 
 import SwiftUI
+
 struct MessagingView: View {
-    @StateObject var viewModel = MessageViewModel() // Observes the MessageViewModel for changes
+    @StateObject var viewModel: MessageViewModel // Dynamically created with currentUserID
     var chatID: String
-    var senderID: String
+    var currentUserID: String
     var receiverID: String
- 
-   
+
     @State private var newMessageText: String = ""
+
+    init(chatID: String, currentUserID: String, receiverID: String) {
+        self.chatID = chatID
+        self.currentUserID = currentUserID
+        self.receiverID = receiverID
+        _viewModel = StateObject(wrappedValue: MessageViewModel())
+    }
 
     var body: some View {
         VStack {
@@ -30,7 +37,7 @@ struct MessagingView: View {
                             MessageBubble(message: message)
                         }
                     }
-                    .onChange(of: viewModel.messages) { _ in
+                    .onChange(of: viewModel.messages) { _ in // New message sends screen to bottom
                         if let lastMessage = viewModel.messages.last {
                             proxy.scrollTo(lastMessage.id, anchor: .bottom)
                         }
@@ -52,17 +59,22 @@ struct MessagingView: View {
             MessageField(message: $newMessageText) { text in
                 viewModel.sendMessage(
                     chatID: chatID,
-                    senderID: senderID,
+                    senderID: currentUserID,
                     receiverID: receiverID,
                     messageText: text
                 )
             }
         }
         .background(Color("Gray"))
+        // Displays all messages on appear
+        .onAppear {
+            print("MessagingView appeared for chatID: \(chatID)")
+            viewModel.loadMessages(for: chatID)
+        }
     }
 }
 
 // Preview for MessagingView
 #Preview {
-    MessagingView(chatID: "testChatID", senderID: "testSenderID", receiverID: "testReceiverID")
+    MessagingView(chatID: "Test", currentUserID: "ruI196nXC1e06whgCwpBJiwOnNX2", receiverID: "1")
 }
