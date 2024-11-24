@@ -20,17 +20,20 @@ struct LandingPageStep: View {
             Image(imageName)
                 .resizable()
                 .scaledToFit()
+                .aspectRatio(contentMode: .fill)
                 .frame(height: 313) // Adjust the image size as needed
                 .clipShape(Circle())
             
             Text(title)
                 .font(.custom("Outfit-Semibold", size: 34))
                 .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
                 .padding(.top, 20)
             
             Text(description)
                 .font(.custom("Outfit-Regular", size: 16))
                 .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
                 .padding(.top, 10)
             
             Spacer()
@@ -40,5 +43,5 @@ struct LandingPageStep: View {
 }
 
 #Preview {
-    LandingPageStep(imageName: "landingPageImage-1", title: "Live with like-minded people.", description: "It's easier than you think.")
+    LandingPageStep(imageName: "landing1", title: "Live with like-minded people.", description: "It's easier than you think.")
 }
