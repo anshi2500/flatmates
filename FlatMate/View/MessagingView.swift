@@ -34,7 +34,7 @@ struct MessagingView: View {
                 ScrollView {
                     VStack(spacing: 10) {
                         ForEach(viewModel.messages, id: \.id) { message in
-                            MessageBubble(message: message)
+                            MessageBubble(message: message, received: currentUserID != message.senderID)
                         }
                     }
                     .onChange(of: viewModel.messages) { _ in // New message sends screen to bottom

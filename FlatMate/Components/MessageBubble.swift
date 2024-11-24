@@ -7,10 +7,10 @@
 
 import SwiftUI
 
-let received = true // Temporary until able to check for userID match.
 
 struct MessageBubble: View {
     var message: Message
+    var received: Bool
     @State private var showTime = false
     
     var body: some View {
