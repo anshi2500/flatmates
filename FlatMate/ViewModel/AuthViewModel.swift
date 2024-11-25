@@ -97,6 +97,7 @@ class AuthViewModel: ObservableObject {
         firstname: String,
         lastname: String,
         dob: Date, // Updated to accept Date instead of age
+        age: Int,
         bio: String,
         isSmoker: Bool,
         pets: Bool,
@@ -113,6 +114,7 @@ class AuthViewModel: ObservableObject {
             "firstName": firstname,
             "lastName": lastname,
             "dob": Timestamp(date: dob), // Store Date as Firestore Timestamp
+            "age": age,
             "bio": bio,
             "isSmoker": isSmoker,
             "pets": pets,
