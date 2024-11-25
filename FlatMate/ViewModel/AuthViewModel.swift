@@ -78,6 +78,58 @@ class AuthViewModel: ObservableObject {
         }
     }
     
+    func submitOnboardingData(
+        firstName: String,
+        lastName: String,
+        dob: Date,
+        gender: String,
+        bio: String,
+        roomState: String,
+        isSmoker: Bool,
+        petsOk: Bool,
+        noise: Double,
+        partyFrequency: String,
+        guestFrequency: String,
+        location: String,
+        city: String,
+        province: String,
+        country: String,
+        onComplete: @escaping () -> Void
+    ) async throws {
+        guard let userID = userSession?.uid else { return }
+        let calendar = Calendar.current
+        let ageComponents = calendar.dateComponents([.year], from: dob, to: Date())
+        let age = ageComponents.year ?? 0 // Fallback to 0 if age cannot be calculated
+        
+        let data: [String: Any] = [
+            "firstName": firstName,
+            "lastName": lastName,
+            "dob": dob,
+            "age": age, // Include the calculated age here
+            "gender": gender,
+            "bio": bio,
+            "roomState": roomState,
+            "isSmoker": isSmoker,
+            "petsOk": petsOk,
+            "noise": noise,
+            "partyFrequency": partyFrequency,
+            "guestFrequency": guestFrequency,
+            "location": location,
+            "city": city,          // Add city
+            "province": province,  // Add province
+            "country": country,    // Add country
+        ]
+        
+        do {
+            print("Saving onboarding data to Firebase...")
+            try await Firestore.firestore().collection("users").document(userID).updateData(data)
+            onComplete() // Notify the caller that the operation is complete
+        } catch {
+            print("DEBUG: Failed to save onboarding data with error \(error.localizedDescription)")
+            throw error
+        }
+    }
+    
     func completeOnboarding() async throws {
         guard let uid = userSession?.uid else { return }
         do {
