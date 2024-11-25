@@ -32,6 +32,9 @@ struct ContentView: View {
                 }
             }
         }
+        .onAppear {
+            print("ContentView appeared")
+        }
     }
 }
 

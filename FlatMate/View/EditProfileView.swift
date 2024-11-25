@@ -5,13 +5,6 @@
 //  Created by Anshi on 2024-10-22.
 //
 
-//
-//  Edit_Profile.swift
-//
-//
-//  Created by Anshi on 2024-10-22.
-//
-
 import SwiftUI
 import PhotosUI
 import FirebaseFirestore
@@ -22,7 +15,7 @@ let frequencies = ["Never", "Sometimes", "Always"]
 struct EditProfileView: View {
     @EnvironmentObject var viewModel: AuthViewModel
     @Environment(\.presentationMode) var presentationMode // Add this environment property
-
+    
     // Profile fields
     @State private var firstName: String = ""
     @State private var lastName: String = ""
@@ -39,7 +32,7 @@ struct EditProfileView: View {
     @State private var isImagePickerPresented = false
     @State private var errorMessage: String?
     @State private var selectedItem: PhotosPickerItem? = nil
-
+    
     var body: some View {
         NavigationView {
             ScrollView {
@@ -48,7 +41,7 @@ struct EditProfileView: View {
                     Text("Edit Profile")
                         .font(.custom("Outfit-Bold", size: 28))
                     Divider()
-
+                    
                     // Profile Picture
                     HStack {
                         VStack {
@@ -79,7 +72,9 @@ struct EditProfileView: View {
                                     Task {
                                         if let data = try? await newValue?.loadTransferable(type: Data.self),
                                            let uiImage = UIImage(data: data) {
-                                            profileImage = uiImage
+                                            DispatchQueue.main.async {
+                                                profileImage = uiImage
+                                            }
                                         }
                                     }
                                 }
@@ -97,10 +92,10 @@ struct EditProfileView: View {
                                 }
                         }
                     }
-
+                    
                     // Gender Picker
                     GenderPicker(selectedGender: $selectedGender)
-
+                    
                     // Personal Bio
                     VStack(alignment: .leading) {
                         Text("Personal Bio")
@@ -110,7 +105,7 @@ struct EditProfileView: View {
                             .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray, lineWidth: 1))
                     }
                     Divider()
-
+                    
                     // Toggles
                     Toggle("I am a smoker.", isOn: $isSmoker)
                         .font(.custom("Outfit-Bold", fixedSize: 15))
@@ -120,7 +115,7 @@ struct EditProfileView: View {
                         .font(.custom("Outfit-Bold", fixedSize: 15))
                         .tint(Color("primary"))
                     Divider()
-
+                    
                     // Party Frequency
                     VStack(alignment: .leading) {
                         Text("How often do you host parties?")
@@ -132,7 +127,7 @@ struct EditProfileView: View {
                         }
                         .pickerStyle(SegmentedPickerStyle())
                     }
-
+                    
                     // Guest Frequency
                     VStack(alignment: .leading) {
                         Text("How often do you have guests over?")
@@ -144,7 +139,7 @@ struct EditProfileView: View {
                         }
                         .pickerStyle(SegmentedPickerStyle())
                     }
-
+                    
                     // Noise Tolerance Slider
                     VStack(alignment: .leading) {
                         Text("Noise Tolerance")
@@ -156,7 +151,7 @@ struct EditProfileView: View {
                             Text("Loud")
                         }
                     }
-
+                    
                     // Update Button
                     HStack {
                         ButtonView(title: "Update", action: { updateProfile() })
@@ -170,14 +165,14 @@ struct EditProfileView: View {
             }
         }
     }
-
+    
     // Fetch user data from Firebase
     private func fetchUserData() {
         guard let userID = viewModel.userSession?.uid else {
             errorMessage = "User not logged in"
             return
         }
-
+        
         let userDocRef = Firestore.firestore().collection("users").document(userID)
         userDocRef.getDocument { snapshot, error in
             if let error = error {
@@ -185,12 +180,12 @@ struct EditProfileView: View {
                 errorMessage = "Failed to fetch user data"
                 return
             }
-
+            
             guard let data = snapshot?.data() else {
                 errorMessage = "User data not found"
                 return
             }
-
+            
             // Populate fields
             firstName = data["firstName"] as? String ?? ""
             lastName = data["lastName"] as? String ?? ""
@@ -205,14 +200,14 @@ struct EditProfileView: View {
             selectedPartyFrequency = data["partyFrequency"] as? String ?? frequencies[0]
             selectedGuestFrequency = data["guestFrequency"] as? String ?? frequencies[0]
             noiseTolerance = data["noise"] as? Double ?? 0.0
-
+            
             if let imageURLString = data["profileImageURL"] as? String,
                let url = URL(string: imageURLString) {
                 loadImage(from: url)
             }
         }
     }
-
+    
     // Load image from URL
     private func loadImage(from url: URL) {
         URLSession.shared.dataTask(with: url) { data, _, _ in
@@ -223,7 +218,7 @@ struct EditProfileView: View {
             }
         }.resume()
     }
-
+    
     // Update profile data
     private func updateProfile() {
         Task {
@@ -249,7 +244,7 @@ struct EditProfileView: View {
             }
         }
     }
-
+    
     // Helper function to calculate age from date of birth
     private func calculateAge(from dob: Date) -> Int {
         let calendar = Calendar.current
