@@ -134,9 +134,13 @@ struct OnboardingPageView: View {
         switch currentStep {
             case 0:
                 return firstName != "" && lastName != ""
-            case 1:
-                // Time interval is in seconds, we're just checking that the default date was changed to a date in the past
-                return dob.timeIntervalSinceNow < -100 && gender != "" && bio != ""
+            case 1: // Verify age > 18YO.
+                let calendar = Calendar.current
+                let now = Date()
+                let ageComponents = calendar.dateComponents([.year], from: dob, to: now)
+                let age = ageComponents.year ?? 0
+            
+            return dob.timeIntervalSinceNow < -100 && age >= 18 && gender != "" && bio != ""
             case 2:
                 return roomState != ""
             case 3:
@@ -188,3 +192,4 @@ struct OnboardingPageView: View {
         }
     }
 }
+
