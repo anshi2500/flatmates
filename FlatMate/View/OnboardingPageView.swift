@@ -29,7 +29,6 @@ struct OnboardingPageView: View {
     @State private var province = "" // The selected province/state
     @State private var country = ""  // The selected country
     @State private var showLocationSearch = false // State to control location search sheet
-    
     @EnvironmentObject var viewModel: AuthViewModel
     var onComplete: () -> Void
     private var age: Int? {
@@ -145,6 +144,30 @@ struct OnboardingPageView: View {
         ]
     }
     
+    func handleSubmit() {
+        guard let userID = viewModel.userSession?.uid else { return }
+        let data: [String: Any] = [
+            "firstName": firstName,
+            "lastName": lastName,
+            "dob": dob,
+            "gender": gender,
+            "bio": bio,
+            "roomState": roomState,
+            "isSmoker": isSmoker,
+            "petsOk": petsOk,
+            "noise": noise,
+            "partyFrequency": partyFrequency,
+            "guestFrequency": guestFrequency
+        ]
+        Firestore.firestore().collection("users").document(userID).updateData(data) { error in
+            if let error = error {
+                print("DEBUG: Failed to save onboarding data with error \(error.localizedDescription)")
+            } else {
+                onComplete()
+            }
+        }
+    }
+
     func isStepComplete() -> Bool {
         switch currentStep {
         case 0:

@@ -8,6 +8,7 @@
 import Foundation
 import FirebaseAuth
 import FirebaseFirestore
+import FirebaseStorage
 
 protocol AuthenticationFormProtocol {
     var formIsValid: Bool { get }
@@ -21,12 +22,14 @@ class AuthViewModel: ObservableObject {
     
     init() {
         self.userSession = Auth.auth().currentUser
+        Task { await fetchUser() }
     }
     
     func signIn(withEmail email: String, password: String) async throws {
         do {
             let result = try await Auth.auth().signIn(withEmail: email, password: password)
             self.userSession = result.user
+            await fetchUser()
         } catch {
             print("DEBUG: Failed to log in with error \(error.localizedDescription)")
             throw error // Propogate the error to the caller
@@ -40,6 +43,7 @@ class AuthViewModel: ObservableObject {
             let user = User(id: result.user.uid, email: email, username: username, hasCompletedOnboarding: false)
             let encodedUser = try Firestore.Encoder().encode(user)
             try await Firestore.firestore().collection("users").document(user.id).setData(encodedUser)
+            self.currentUser = user
         } catch {
             print("DEBUG: Failed to create user with error \(error.localizedDescription)")
             throw error // Propagate the error
@@ -65,7 +69,7 @@ class AuthViewModel: ObservableObject {
         }
     }
     
-    func fetchUser() async throws {
+    func fetchUser() async {
         guard let uid = userSession?.uid else { return }
         do {
             let snapshot = try await Firestore.firestore().collection("users").document(uid).getDocument()
@@ -137,6 +141,71 @@ class AuthViewModel: ObservableObject {
             self.hasCompletedOnboarding = true
         } catch {
             print("DEBUG: Failed to update onboarding status with error \(error.localizedDescription)")
+            throw error
+        }
+    }
+    
+    func updateProfile(
+        firstname: String,
+        lastname: String,
+        dob: Date, // Updated to accept Date instead of age
+        age: Int,
+        bio: String,
+        isSmoker: Bool,
+        pets: Bool,
+        gender: String,
+        partyFrequency: String,
+        guestFrequency: String,
+        noiseTolerance: Double,
+        profileImage: UIImage?
+    ) async throws {
+        guard let uid = userSession?.uid else { throw NSError(domain: "AuthError", code: 401, userInfo: [NSLocalizedDescriptionKey: "User not logged in"]) }
+
+        // Prepare updated data
+        var updatedData: [String: Any] = [
+            "firstName": firstname,
+            "lastName": lastname,
+            "dob": Timestamp(date: dob), // Store Date as Firestore Timestamp
+            "age": age,
+            "bio": bio,
+            "isSmoker": isSmoker,
+            "pets": pets,
+            "gender": gender,
+            "partyFrequency": partyFrequency,
+            "guestFrequency": guestFrequency,
+            "noiseTolerance": noiseTolerance
+        ]
+
+        do {
+            // Upload profile image if available
+            if let profileImage = profileImage, let imageData = profileImage.jpegData(compressionQuality: 0.8) {
+                let storageRef = Storage.storage().reference().child("profile_images/\(uid).jpg")
+                let _ = try await storageRef.putDataAsync(imageData)
+                let downloadURL = try await storageRef.downloadURL()
+                updatedData["profileImageURL"] = downloadURL.absoluteString
+            }
+
+            // Update Firestore document
+            try await Firestore.firestore().collection("users").document(uid).updateData(updatedData)
+
+            // Update local `currentUser` with the new data
+            if var currentUser = self.currentUser {
+                currentUser.firstName = firstname
+                currentUser.lastName = lastname
+                currentUser.dob = dob // Update dob directly
+                currentUser.bio = bio
+                currentUser.isSmoker = isSmoker
+                currentUser.pets = pets
+                currentUser.gender = gender
+                currentUser.partyFrequency = partyFrequency
+                currentUser.guestFrequency = guestFrequency
+                currentUser.noiseTolerance = noiseTolerance
+                if let profileImageURL = updatedData["profileImageURL"] as? String {
+                    currentUser.profileImageURL = profileImageURL
+                }
+                self.currentUser = currentUser
+            }
+        } catch {
             throw error
         }
     }

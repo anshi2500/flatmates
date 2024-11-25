@@ -8,79 +8,58 @@
 import SwiftUI
 
 struct ProfileView: View {
-    var userName: String = "John"
-    var userAge: Int = 25
-
-    // State variables for handling button clicks
-    @State private var isSettingClicked = false
-    @State private var isEditProfileClicked = false
-    @State private var isLogOutClicked = false
     @EnvironmentObject var viewModel: AuthViewModel
 
     var body: some View {
-        NavigationView {
-            VStack {
-                // Logo at the top
-                Image("Logo")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 103)
-                    .padding(.bottom, 20)
+        VStack {
+            Image("Logo")
+                .resizable()
+                .scaledToFit()
+                .frame(height: 103)
+                .padding(.bottom, 20)
 
-                // Profile Image
-                Image("profileImage")
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .clipShape(Circle())
-                    .frame(width: 220, height: 220)
-                    .padding(.top, 20)
-                    .padding(.bottom, 5)
-                    .shadow(radius: 10)
+            Image("profileImage")
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .clipShape(Circle())
+                .frame(width: 220, height: 220)
+                .padding(.top, 20)
+                .padding(.bottom, 5)
+                .shadow(radius: 10)
 
-                // User Details
-                Text("\(userName), \(userAge)")
-                    .font(.title)
-                    .fontWeight(.bold)
+            Text("John, 25")
+                .font(.title)
+                .fontWeight(.bold)
 
-                Spacer()
+            Spacer()
 
-                // Reuse ProfileButton for Settings, Edit Profile, Logout
-                VStack(spacing: 20) {
-                    HStack(spacing: 20) {
-                        ProfileButton(
-                            icon: "settings_icon",
-                            label: "SETTINGS",
-                            isSelected: isSettingClicked,
-                            action: { isSettingClicked.toggle() }
-                        )
-                        ProfileButton(
-                            icon: "logout_icon",
-                            label: "LOGOUT",
-                            isSelected: isLogOutClicked,
-                            action: { viewModel.signOut() } // Activate logout navigation
-                        )
-                    }
+            VStack(spacing: 20) {
+                HStack(spacing: 20) {
                     ProfileButton(
-                        icon: "edit_icon",
-                        label: "EDIT PROFILE",
-                        isSelected: isEditProfileClicked,
-                        action: { isEditProfileClicked = true } // Navigate to EditProfileView
+                        icon: "settings_icon",
+                        label: "SETTINGS",
+                        isSelected: false,
+                        action: { print("Settings tapped!") }
+                    )
+                    ProfileButton(
+                        icon: "logout_icon",
+                        label: "LOGOUT",
+                        isSelected: false,
+                        action: { viewModel.signOut() }
                     )
                 }
-                .padding(.bottom, 40)
+                ProfileButton(
+                    icon: "edit_icon",
+                    label: "EDIT PROFILE",
+                    isSelected: false,
+                    destination: EditProfileView()
+                )
+            }
+            .padding(.bottom, 40)
 
-                Spacer()
-            }
-            .navigationBarBackButtonHidden(true) // Hide default back button
-            // Add .navigationDestination for Edit Profile
-            .navigationDestination(isPresented: $isEditProfileClicked) {
-                EditProfileView()
-            }
-            // Add .navigationDestination for Logout
-            .navigationDestination(isPresented: $isLogOutClicked) {
-                LoginView()
-            }
+            Spacer()
         }
+        .navigationBarBackButtonHidden(true)
     }
 }
 

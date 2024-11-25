@@ -18,7 +18,11 @@ struct ContentView: View {
                 } else {
                     OnboardingPageView(onComplete: {
                         Task {
-                            try? await viewModel.completeOnboarding()
+                            do {
+                                try await viewModel.completeOnboarding() // Update Firebase and ViewModel
+                            } catch {
+                                print("DEBUG: Failed to mark onboarding as complete: \(error)")
+                            }
                         }
                     })
                 }
