@@ -12,7 +12,7 @@ struct ContentView: View {
     
     var body: some View {
         Group {
-            if let userSession = viewModel.userSession {
+            if viewModel.userSession != nil {
                 if viewModel.hasCompletedOnboarding {
                     MainView()
                 } else {
