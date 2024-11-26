@@ -9,27 +9,42 @@ import SwiftUI
 
 struct MatchRow: View {
     let name: String
-    let imageName: String
-    let messagePreview: String
+    let imageURL: String // Updated to use imageURL
+    //let messagePreview: String
     
     var body: some View {
         VStack {
             HStack(spacing: 16) {
                 // Profile Image
-                Image(imageName)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 90, height: 90)
-                    .clipShape(Circle())
+                AsyncImage(url: URL(string: imageURL)) { phase in
+                    if let image = phase.image {
+                        image
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 90, height: 90)
+                            .clipShape(Circle())
+                    } else if phase.error != nil {
+                        // Display a placeholder if there's an error
+                        Image(systemName: "person.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 90, height: 90)
+                            .foregroundColor(.gray)
+                    } else {
+                        // Display a placeholder while loading
+                        ProgressView()
+                            .frame(width: 90, height: 90)
+                    }
+                }
                 
                 // Name and Message Preview
                 VStack(alignment: .leading, spacing: 4) {
                     Text(name)
                         .font(.headline)
-                    Text(messagePreview)
+                    /*Text(messagePreview)
                         .font(.subheadline)
                         .foregroundColor(.gray)
-                        .lineLimit(1)
+                        .lineLimit(1)*/ // Future iteration.
                 }
                 
                 Spacer()
@@ -45,7 +60,7 @@ struct MatchRow: View {
 #Preview {
     MatchRow(
         name: "Alex Johnson",
-        imageName: "person1",
-        messagePreview: "Hello!"
+        imageURL: "https://example.com/profile-picture.jpg"
+        //messagePreview: "Hello!"
     )
 }

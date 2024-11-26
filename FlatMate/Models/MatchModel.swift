@@ -6,18 +6,59 @@
 //
 
 import Foundation
+import Firebase
 
 struct Match: Identifiable {
     let id = UUID()
     let name: String
-    let imageName: String
-    let messagePreview: String?
+    let imageURL: String
+    //let messagePreview: String? // Later iteration
     
-    static let sampleMatches: [Match] = [
-        Match(name: "Alex Johnson", imageName: "person1", messagePreview: nil),
-        Match(name: "Jamie Lee", imageName: "person2", messagePreview: "Looking forward to meeting you!"),
-        Match(name: "Taylor Smith", imageName: "person3", messagePreview: "Can we schedule a call to discuss further?"),
-        Match(name: "Chris Evans", imageName: "person4", messagePreview: "Hey! Are you still interested in the room?"),
-        Match(name: "Morgan Brown", imageName: "person5", messagePreview: "Let’s finalize the agreement."),
-    ]
+    // Get list of userIDs
+    
+    
+    
+    
+    static func fetchMatches(completion: @escaping ([Match]) -> Void) {
+        let db = Firestore.firestore()
+        let usersCollection = db.collection("users")
+        var matches: [Match] = []
+        
+        let matchIDs = [
+            "XzO97G0ObndYo8fSxchbRLOJJRN2",
+            "xDN83AcoU5ZnPEH49gM3EHt4L3V2"
+        ]
+        
+        let dispatchGroup = DispatchGroup()
+        
+        for matchID in matchIDs {
+            dispatchGroup.enter()
+            usersCollection.document(matchID).getDocument(source: .default) { snapshot, error in
+                if let error = error {
+                    print("Error fetching match data: \(error)")
+                    dispatchGroup.leave()
+                    return
+                }
+                
+                guard let data = snapshot?.data(),
+                      let name = data["firstName"] as? String,
+                      let profilePictureURL = data["profileImageURL"] as? String else {
+                    print("Data missing or in incorrect format for matchID: \(matchID)")
+                    dispatchGroup.leave()
+                    return
+                }
+                
+                let match = Match(
+                    name: name,
+                    imageURL: profilePictureURL
+                )
+                matches.append(match)
+                dispatchGroup.leave()
+            }
+            
+            dispatchGroup.notify(queue: .main) {
+                completion(matches)
+            }
+        }
+    }
 }

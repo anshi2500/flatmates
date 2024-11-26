@@ -6,10 +6,12 @@
 //
 
 import SwiftUI
+import Firebase
 
 struct MessagesView: View {
-    let matches = Match.sampleMatches
-    
+    @State private var matches: [Match] = []
+    @State private var isLoading = true
+
     var body: some View {
         VStack(alignment: .leading) {
             // Title
@@ -18,22 +20,45 @@ struct MessagesView: View {
                 .foregroundColor(Color("primary"))
                 .padding(.horizontal)
             
-            // List of Matches
-            ScrollView {
-                VStack(spacing: 16) {
-                    ForEach(matches) { match in
-                        MatchRow(
-                            name: match.name,
-                            imageName: match.imageName,
-                            messagePreview: match.messagePreview ?? "Start a conversation with \(match.name.components(separatedBy: " ").first ?? match.name)!"
-                        )
+            if isLoading {
+                // Loading Indicator
+                ProgressView("Loading matches...")
+                    .padding()
+            } else {
+                if matches.isEmpty {
+                    // Empty State
+                    Text("No matches found.")
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                        .padding(.horizontal)
+                } else {
+                    // List of Matches
+                    ScrollView {
+                        VStack(spacing: 16) {
+                            ForEach(matches) { match in
+                                MatchRow(
+                                    name: match.name,
+                                    imageURL: match.imageURL
+                                )
+                            }
+                        }
+                        .padding()
                     }
                 }
-                .padding()
             }
             Spacer()
         }
         .navigationTitle("Messages")
+        .onAppear {
+            loadMatches()
+        }
+    }
+
+    private func loadMatches() {
+        Match.fetchMatches { fetchedMatches in
+            self.matches = fetchedMatches
+            self.isLoading = false
+        }
     }
 }
 

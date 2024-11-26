@@ -10,7 +10,7 @@
 import SwiftUI
 
 struct MessagingView: View {
-    @StateObject var viewModel: MessageViewModel // Dynamically created with currentUserID
+    @StateObject var viewModel: MessagingViewModel // Dynamically created with currentUserID
     var chatID: String
     var currentUserID: String
     var otherUserID: String
@@ -21,7 +21,7 @@ struct MessagingView: View {
         self.chatID = chatID
         self.currentUserID = currentUserID
         self.otherUserID = otherUserID
-        _viewModel = StateObject(wrappedValue: MessageViewModel())
+        _viewModel = StateObject(wrappedValue: MessagingViewModel())
     }
 
     var body: some View {
