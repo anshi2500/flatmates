@@ -27,11 +27,13 @@ struct ProfileView: View {
                         .scaleEffect(1.5)
                         .padding()
                 } else {
-                    Image("Logo")
+                    Image("Logo Straight Blue")
                         .resizable()
                         .scaledToFit()
                         .frame(height: 103)
+                        .padding(.top, 15)
                         .padding(.bottom, 20)
+                        .padding(.horizontal, 35)
                     
                     // Display the profile image
                     if let image = profileImage {
