@@ -26,7 +26,7 @@ class MessagesViewModel: ObservableObject {
     }
     
     // Fetches matches and updates state
-    private func loadMatches() {
+    func loadMatches() {
         guard let currentUserID = self.currentUserID else {
             print("Error: currentUserID is nil")
             isLoading = false

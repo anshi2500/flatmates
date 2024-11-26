@@ -65,6 +65,10 @@ struct MessagesView: View {
             }
             Spacer()
         }
+        .onAppear {
+            // Reload matches whenever the view appears
+            viewModel.loadMatches()
+        }
         .navigationTitle("Messages")
     }
 }
