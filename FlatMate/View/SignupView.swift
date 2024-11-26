@@ -21,11 +21,13 @@ struct SignupView: View {
         NavigationView {
             VStack {
                 // Logo Image
-                Image("Logo")
+                Image("Logo Straight Blue")
                     .resizable()
                     .scaledToFit()
                     .frame(height: 103)
+                    .padding(.top, 15)
                     .padding(.bottom, 20)
+                    .padding(.horizontal, 35)
                 
                 // Signup Title
                 Text("Create Your Account")
