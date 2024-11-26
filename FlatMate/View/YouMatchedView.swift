@@ -47,44 +47,87 @@ struct YouMatchedView: View {
     var thisUser: User
     var otherUser: ProfileCardView.Model
 
+    @State private var chatID: String? = nil
+    @State private var isChatLoading: Bool = false
+    @State private var navigateToMessagingView = false
+
     var body: some View {
-        VStack {
-            Text("It's a Match!")
-                .font(.custom("Outfit-Bold", size: 48))
-                .foregroundStyle(Color("primary"))
-                .padding()
-            Spacer()
-            HStack {
-                VStack {
-                    renderProfileImageFromUrl(otherUser.profileImageURL)
-                    Text("\(otherUser.firstName), \(otherUser.age)").font(.custom("Outfit-Bold", size: 24))
-                }
-                .padding()
-                VStack {
-                    renderProfileImageFromUrl(thisUser.profileImageURL)
-                    Text("\(thisUser.firstName ?? "You"), \(calculateAge(from: thisUser.dob!))").font(.custom("Outfit-Bold", size: 24))
-                }
-                .padding()
-            }
-            Spacer()
-            HStack(spacing: 30) {
-                // Previous Button
-                ButtonView(
-                    title: "Keep Swiping",
-                    action: {
-                        isOpen = false
-                    },
-                    type: .outline
-                )
-                ButtonView(
-                    title: "Send Message",
-                    action: {
-                        print("Goto chat page")
-                        // TODO: navigate to chat page when its implemented
+        NavigationStack {
+            VStack {
+                Text("It's a Match!")
+                    .font(.custom("Outfit-Bold", size: 48))
+                    .foregroundStyle(Color("primary"))
+                    .padding()
+                Spacer()
+                HStack {
+                    VStack {
+                        renderProfileImageFromUrl(otherUser.profileImageURL)
+                        Text("\(otherUser.firstName), \(otherUser.age)")
+                            .font(.custom("Outfit-Bold", size: 24))
                     }
-                )
+                    .padding()
+                    VStack {
+                        renderProfileImageFromUrl(thisUser.profileImageURL)
+                        Text("\(thisUser.firstName ?? "You"), \(calculateAge(from: thisUser.dob!))")
+                            .font(.custom("Outfit-Bold", size: 24))
+                    }
+                    .padding()
+                }
+                Spacer()
+                HStack(spacing: 30) {
+                    ButtonView(
+                        title: "Keep Swiping",
+                        action: {
+                            isOpen = false
+                        },
+                        type: .outline
+                    )
+                    ButtonView(
+                        title: "Send Message",
+                        action: {
+                            if let chatID = chatID {
+                                print("Navigating to chatID: \(chatID)")
+                                navigateToMessagingView = true
+                            } else {
+                                print("ChatID not yet loaded.")
+                            }
+                        }
+                    )
+                    .disabled(chatID == nil || isChatLoading)
+                }
+            }
+            .padding()
+            .onAppear {
+                fetchChatID() // Fetch chatID on appear
+            }
+            .navigationDestination(isPresented: $navigateToMessagingView) {
+                if let chatID = chatID {
+                    MessagingView(
+                        chatID: chatID,
+                        currentUserID: thisUser.id,
+                        otherUserID: otherUser.id
+                    )
+                } else {
+                    Text("Loading chat...")
+                }
             }
         }
-        .padding()
+    }
+
+    private func fetchChatID() {
+        guard chatID == nil else { return } // Prevent duplicate calls
+        isChatLoading = true
+
+        ChatUtilities.getOrCreateChatID(user1: thisUser.id, user2: otherUser.id) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let fetchedChatID):
+                    self.chatID = fetchedChatID
+                case .failure(let error):
+                    print("Error fetching or creating chatID: \(error.localizedDescription)")
+                }
+                self.isChatLoading = false
+            }
+        }
     }
 }
