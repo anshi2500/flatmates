@@ -37,9 +37,14 @@ struct SwipePageView: View {
             }
         }
         .onAppear {
-            userID = authViewModel.userSession?.uid ?? ""
-            viewModel.fetchProfiles()
-            thisUser = authViewModel.currentUser
+            Task {
+                // Fetch current user ID and other necessary data
+                if let currentUserID = authViewModel.userSession?.uid {
+                    self.userID = currentUserID
+                    self.thisUser = authViewModel.currentUser
+                    await viewModel.fetchProfiles(currentUserID: currentUserID)
+                }
+            }
         }
         .animation(.easeInOut, value: matchConfirmed)
     }

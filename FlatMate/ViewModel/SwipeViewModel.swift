@@ -21,32 +21,34 @@ class SwipeViewModel: ObservableObject {
         matchService.swipe(userID: userID, targetUserID: targetUserID, isLike: isLike, completion: completion)
     }
 
-    func fetchProfiles() {
+    func fetchProfiles(currentUserID: String) async {
         let db = Firestore.firestore()
-        isLoading = true
-        db.collection("users")
-            .getDocuments { snapshot, error in
-                if let error = error {
-                    print("Error fetching profiles: \(error.localizedDescription)")
-                    self.isLoading = false
-                    return
-                }
+        await MainActor.run { self.isLoading = true } // Update UI on main thread
 
-                guard let documents = snapshot?.documents else {
-                    print("No profiles found")
-                    self.isLoading = false
-                    return
-                }
+        do {
+            // Firestore query to fetch all users except the current user
+            let snapshot = try await db.collection("users")
+                .whereField("id", isNotEqualTo: currentUserID)
+                .getDocuments()
 
-                self.profiles = documents.compactMap { doc in
-                    do {
-                        return try doc.data(as: ProfileCardView.Model.self)
-                    } catch {
-                        print("Error decoding profile: \(error.localizedDescription)")
-                        return nil
-                    }
+            // Decode profiles into the model
+            let profiles = snapshot.documents.compactMap { doc -> ProfileCardView.Model? in
+                do {
+                    return try doc.data(as: ProfileCardView.Model.self)
+                } catch {
+                    print("Error decoding profile: \(error.localizedDescription)")
+                    return nil
                 }
+            }
+
+            // Update UI on main thread
+            await MainActor.run {
+                self.profiles = profiles
                 self.isLoading = false
             }
+        } catch {
+            print("Error fetching profiles: \(error.localizedDescription)")
+            await MainActor.run { self.isLoading = false }
+        }
     }
 }
