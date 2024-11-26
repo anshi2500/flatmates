@@ -9,8 +9,7 @@ import SwiftUI
 
 struct MatchRow: View {
     let name: String
-    let imageURL: String // Updated to use imageURL
-    //let messagePreview: String
+    let imageURL: String
     
     var body: some View {
         VStack {

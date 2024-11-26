@@ -23,64 +23,94 @@ struct Match: Identifiable {
     
     static func fetchMatches(completion: @escaping ([Match]) -> Void) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
-                    print("Error: No authenticated user found.")
-                    completion([]) // Return an empty array if the user is not logged in
-                    return
-                }
-        
+            print("Error: No authenticated user found.")
+            completion([]) // Return an empty array if the user is not logged in
+            return
+        }
+
         let db = Firestore.firestore()
+        let matchesCollection = db.collection("matches")
         let usersCollection = db.collection("users")
-        let chatCollection = db.collection("chats")
+        var matchIDs: [String] = []
         var matches: [Match] = []
-        
-        let matchIDs = [
-            "XzO97G0ObndYo8fSxchbRLOJJRN2",
-            "xDN83AcoU5ZnPEH49gM3EHt4L3V2",
-            "J0ZdJ3XQzORZxcSa1COTNq6C1oS2",
-            "rNF1Q1CPxad4RNxBFya28YVat3s2"
-        ]
-        
-        
-        
+
         let dispatchGroup = DispatchGroup()
-        
-        for matchID in matchIDs {
-            dispatchGroup.enter()
-            
-            usersCollection.document(matchID).getDocument(source: .default) { snapshot, error in
+
+        // Query the matches collection to find documents where currentUserID is involved
+        matchesCollection
+            .whereField("user1", isEqualTo: currentUserID)
+            .getDocuments { snapshot, error in
                 if let error = error {
-                    print("Error fetching match data: \(error)")
-                    dispatchGroup.leave()
+                    print("Error fetching matches for user1: \(error)")
+                    completion([])
                     return
                 }
                 
-                guard let data = snapshot?.data(),
-                      let name = data["firstName"] as? String,
-                      let profilePictureURL = data["profileImageURL"] as? String else {
-                    print("Data missing or in incorrect format for matchID: \(matchID)")
-                    dispatchGroup.leave()
-                    return
+                snapshot?.documents.forEach { document in
+                    if let user2 = document.data()["user2"] as? String {
+                        matchIDs.append(user2) // Add the other user
+                    }
                 }
                 
-                // Fetch or create chatID
-                fetchChatID(user1: currentUserID, user2: matchID) { chatID in
-                    let match = Match(
-                        id: matchID,
-                        name: name,
-                        imageURL: profilePictureURL,
-                        chatID: chatID
-                    )
-                    print("Found match with chatID: \(name) - \(chatID)")
-                    matches.append(match)
-                    dispatchGroup.leave()
-                }
+                // Query the other way (currentUserID as user2)
+                matchesCollection
+                    .whereField("user2", isEqualTo: currentUserID)
+                    .getDocuments { snapshot, error in
+                        if let error = error {
+                            print("Error fetching matches for user2: \(error)")
+                            completion([])
+                            return
+                        }
+                        
+                        snapshot?.documents.forEach { document in
+                            if let user1 = document.data()["user1"] as? String {
+                                matchIDs.append(user1) // Add the other user
+                            }
+                        }
+                        
+                        // Remove duplicates from matchIDs
+                        matchIDs = Array(Set(matchIDs))
+                        
+                        // Fetch user details for each matchID
+                        for matchID in matchIDs {
+                            dispatchGroup.enter()
+                            
+                            usersCollection.document(matchID).getDocument(source: .default) { snapshot, error in
+                                if let error = error {
+                                    print("Error fetching user data: \(error)")
+                                    dispatchGroup.leave()
+                                    return
+                                }
+                                
+                                guard let data = snapshot?.data(),
+                                      let name = data["firstName"] as? String,
+                                      let profilePictureURL = data["profileImageURL"] as? String else {
+                                    print("Data missing or in incorrect format for matchID: \(matchID)")
+                                    dispatchGroup.leave()
+                                    return
+                                }
+                                
+                                // Fetch or create chatID
+                                fetchChatID(user1: currentUserID, user2: matchID) { chatID in
+                                    let match = Match(
+                                        id: matchID,
+                                        name: name,
+                                        imageURL: profilePictureURL,
+                                        chatID: chatID
+                                    )
+                                    print("Found match with chatID: \(name) - \(chatID ?? "No ChatID")")
+                                    matches.append(match)
+                                    dispatchGroup.leave()
+                                }
+                            }
+                        }
+                        
+                        // Notify when all user data has been fetched
+                        dispatchGroup.notify(queue: .main) {
+                            completion(matches)
+                        }
+                    }
             }
-        }
-        
-        // Call notify after all dispatchGroup tasks are completed
-        dispatchGroup.notify(queue: .main) {
-            completion(matches)
-        }
     }
 
     private static func fetchChatID(user1: String, user2: String, completion: @escaping (String?) -> Void) {
