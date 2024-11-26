@@ -26,7 +26,7 @@ class MessagesViewModel: ObservableObject {
     }
     
     // Fetches matches and updates state
-    private func loadMatches() {
+    func loadMatches() {
         guard let currentUserID = self.currentUserID else {
             print("Error: currentUserID is nil")
             isLoading = false
@@ -39,11 +39,19 @@ class MessagesViewModel: ObservableObject {
             DispatchQueue.global().async {
                 let updatedMatches = fetchedMatches.map { match -> Match in
                     var matchWithChatID = match
-                    self?.getChatID(user1: currentUserID, user2: match.id) { chatID in
+                    
+                    // Use MessageManager's getOrCreateChatID
+                    self?.messageManager.getOrCreateChatID(user1: currentUserID, user2: match.id) { result in
                         DispatchQueue.main.async {
-                            matchWithChatID.chatID = chatID
+                            switch result {
+                            case .success(let chatID):
+                                matchWithChatID.chatID = chatID
+                            case .failure(let error):
+                                print("Failed to fetch or create chatID: \(error.localizedDescription)")
+                            }
                         }
                     }
+                    
                     return matchWithChatID
                 }
 
@@ -54,15 +62,4 @@ class MessagesViewModel: ObservableObject {
             }
         }
     }
-    
-    // Function to fetch or create a chatID asynchronously
-    func getChatID(user1: String, user2: String, completion: @escaping (String) -> Void) {
-           // Your logic for fetching or creating a chatID
-           DispatchQueue.global().async {
-               let chatID = "\(user1)_\(user2)" // Replace this with actual logic
-               DispatchQueue.main.async {
-                   completion(chatID)
-               }
-           }
-       }
 }
