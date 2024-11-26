@@ -34,16 +34,6 @@ struct BottomNavigationBar: View {
             Spacer()
             
             Button(action: {
-                selectedTab = .search
-            }) {
-                Image(systemName: selectedTab == .search ? "magnifyingglass" : "magnifyingglass.circle")
-                .resizable()
-                .foregroundColor(selectedTab == .search ? Color(red: 34/255, green: 87/255, blue: 122/255) : Color.gray)
-                .frame(width: 30, height: 30)
-            }
-            Spacer()
-            
-            Button(action: {
                 selectedTab = .chat
             }) {
                 Image(systemName: selectedTab == .chat ? "message.fill" : "message")
