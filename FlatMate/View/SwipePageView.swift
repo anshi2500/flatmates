@@ -6,68 +6,50 @@
 //
 
 import SwiftUI
-import FirebaseFirestore
 
 struct SwipePageView: View {
-    @EnvironmentObject var viewModel: AuthViewModel // Injected AuthViewModel
-    @State private var profiles: [ProfileCardView.Model] = []
-    @State private var isLoading = true
-    @State private var currentUserID: String = "" // Initialize as an empty string
+    @EnvironmentObject var authViewModel: AuthViewModel
+    @StateObject private var viewModel = SwipeViewModel()
+    @State private var userID: String = ""
 
     var body: some View {
         VStack {
-            if isLoading {
+            if viewModel.isLoading {
                 ProgressView("Loading Profiles...")
-            } else if profiles.isEmpty {
+            } else if viewModel.profiles.isEmpty {
                 Text("No profiles available.")
             } else {
-                let model = SwipeCardsView.Model(cards: profiles)
-                SwipeCardsView(model: model) { model in
-                    print(model.swipedCards)
-                    model.reset()
+                let swipeModel = SwipeCardsView.Model(cards: viewModel.profiles)
+                SwipeCardsView(model: swipeModel) { model in
+                    print("SwipeCardsView action triggered") // Debug print
+
+                    // Debug currentCard and lastSwipeDirection
+                    print("currentCard: \(String(describing: model.currentCard?.firstName))")
+                    print("lastSwipeDirection: \(String(describing: model.lastSwipeDirection))")
+
+                    handleSwipe(card: model.currentCard, direction: model.lastSwipeDirection)
                 }
             }
         }
         .onAppear {
-            // Set the current user ID from the viewModel and fetch profiles
-            if let userID = viewModel.currentUser?.id {
-                currentUserID = userID
-                fetchProfiles()
-            } else {
-                print("Error: Unable to get the current user ID")
-                isLoading = false
-            }
+            userID = authViewModel.userSession?.uid ?? ""
+            viewModel.fetchProfiles()
         }
     }
 
-    private func fetchProfiles() {
-        let db = Firestore.firestore()
-        db.collection("users")
-            .whereField("id", isNotEqualTo: currentUserID) // Exclude the current user
-            .getDocuments { snapshot, error in
-                if let error = error {
-                    print("Error fetching profiles: \(error.localizedDescription)")
-                    return
-                }
+    private func handleSwipe(card: ProfileCardView.Model?, direction: ProfileCardView.SwipeDirection?) {
+        guard let card = card, let direction = direction else {
+            print("Invalid swipe: card or direction is nil")
+            return
+        }
 
-                guard let documents = snapshot?.documents else {
-                    print("No profiles found")
-                    return
-                }
+        let isLike = direction == .right
+        print("Handling swipe for \(card.firstName), direction: \(direction)")
 
-                print("Profiles found: \(documents.count)")
-
-                profiles = documents.compactMap { doc in
-                    do {
-                        return try doc.data(as: ProfileCardView.Model.self)
-                    } catch {
-                        print("Error decoding document \(doc.documentID): \(error)")
-                        return nil
-                    }
-                }
-
-                isLoading = false
-                print("Loaded profiles: \(profiles)")
+        viewModel.handleSwipe(userID: userID, targetUserID: card.id, isLike: isLike) { isMatch in
+            if isMatch {
+                print("You matched with \(card.firstName)!")
             }
+        }
     }
 }
