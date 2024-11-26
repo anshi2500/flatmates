@@ -5,70 +5,66 @@
 //  Created by Ben Schmidt on 2024-10-20.
 //
 
+//
+//  SwipePageView.swift
+//  FlatMate
+//
+//  Created by Ben Schmidt on 2024-10-20.
+//
+
 import SwiftUI
+import FirebaseFirestore
 
 struct SwipePageView: View {
+    @State private var profiles: [ProfileCardView.Model] = []
+    @State private var isLoading = true
+
     var body: some View {
         VStack {
-            let cards = [
-                ProfileCardView.Model(
-                    firstName: "Jane",
-                    age: 24,
-                    gender: "Woman",
-                    bio: "I'm a great cook and love to party!",
-                    hasPlace: false,
-                    neighbourhood: "Brentwood",
-                    imageId: "Placeholder-Jane",
-                    preferences: ProfileCardView.Preferences(
-                        smoker: true,
-                        petsAllowed: false,
-                        wakingHours: 8,
-                        noiseTolerance: 3,
-                        partying: 3,
-                        guests: 5
-                    )
-                ),
-                ProfileCardView.Model(
-                    firstName: "James",
-                    age: 28,
-                    gender: "Man",
-                    bio: "Quiet, diligent student.",
-                    hasPlace: true,
-                    neighbourhood: "Northland",
-                    imageId: "Placeholder-James",
-                    preferences: ProfileCardView.Preferences(
-                        smoker: false,
-                        petsAllowed: true,
-                        wakingHours: 12,
-                        noiseTolerance: 0,
-                        partying: 0,
-                        guests: 0
-                    )
-                ),
-                ProfileCardView.Model(
-                    firstName: "Anaya",
-                    age: 22,
-                    gender: "Woman",
-                    bio: "I love having friends over!",
-                    hasPlace: false,
-                    neighbourhood: "Montgomery",
-                    imageId: "Placeholder-Anaya",
-                    preferences: ProfileCardView.Preferences(
-                        smoker: true,
-                        petsAllowed: false,
-                        wakingHours: 6,
-                        noiseTolerance: 5,
-                        partying: 5,
-                        guests: 5
-                    )
-                ),
-            ]
-
-            let model = SwipeCardsView.Model(cards: cards)
-            SwipeCardsView(model: model) { model in
-                print(model.swipedCards)
-                model.reset()
+            if isLoading {
+                ProgressView("Loading Profiles...")
+            } else if profiles.isEmpty {
+                Text("No profiles available.")
+            } else {
+                let model = SwipeCardsView.Model(cards: profiles)
+                SwipeCardsView(model: model) { model in
+                    print(model.swipedCards)
+                    model.reset()
+                }
             }
         }
+        .onAppear {
+            fetchProfiles()
+        }
+    }
+
+    private func fetchProfiles() {
+        let db = Firestore.firestore()
+        db.collection("users")
+            .getDocuments { snapshot, error in
+                if let error = error {
+                    print("Error fetching profiles: \(error.localizedDescription)")
+                    return
+                }
+
+                guard let documents = snapshot?.documents else {
+                    print("No profiles found")
+                    return
+                }
+
+                print("Profiles found: \(documents.count)")
+
+                profiles = documents.compactMap { doc in
+                    do {
+                        return try doc.data(as: ProfileCardView.Model.self)
+                    } catch {
+                        print("Error decoding document \(doc.documentID): \(error)")
+                        return nil
+                    }
+                }
+
+                isLoading = false
+                print("Loaded profiles: \(profiles)")
+            }
     }
 }

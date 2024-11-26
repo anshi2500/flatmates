@@ -12,27 +12,37 @@ struct ProfileCardView: View {
         case left, right, none
     }
 
-    struct Preferences: Equatable {
-        let smoker: Bool
-        let petsAllowed: Bool
-        let wakingHours: Int
-        let noiseTolerance: Int
-        let partying: Int
-        let guests: Int
-    }
-
-    // TODO: replace this with the profile model
-    struct Model: Identifiable, Equatable {
-        let id = UUID()
+    struct Model: Identifiable, Equatable, Codable {
+        let id: String
         let firstName: String
         let age: Int
         let gender: String
         let bio: String
-        let hasPlace: Bool
-        let neighbourhood: String
-        let imageId: String
-        let preferences: Preferences
+        let roomState: String
+        let location: String
+        let profileImageURL: String
+        let isSmoker: Bool
+        let petsOk: Bool
+        let noiseTolerance: Double
+        let partyFrequency: String
+        let guestFrequency: String
         var swipeDirection: SwipeDirection = .none
+
+        enum CodingKeys: String, CodingKey {
+            case id
+            case firstName
+            case age
+            case gender
+            case bio
+            case roomState
+            case location
+            case profileImageURL
+            case isSmoker
+            case petsOk
+            case noiseTolerance = "noise"
+            case partyFrequency
+            case guestFrequency
+        }
     }
 
     private func renderTextWithEmoji(_ emoji: String, _ text: String) -> HStack<TupleView<(Text, Text)>> {
@@ -42,35 +52,33 @@ struct ProfileCardView: View {
         }
     }
 
-    private func renderWakingHours(_ wakingHours: Int) -> HStack<TupleView<(Text, Text)>> {
-        if wakingHours < 7 {
-            return renderTextWithEmoji("🌅", "Early Riser")
-        }
-        if wakingHours < 10 {
-            return renderTextWithEmoji("🛌", "Average Sleeper")
-        }
-        return renderTextWithEmoji("💤", "Late Sleeper")
-    }
-
-    private func renderPartying(_ partying: Int) -> HStack<TupleView<(Text, Text)>> {
-        if partying < 4 {
-            return renderTextWithEmoji(partying > 0 ? "✅" : "🚫", "Partying")
-        }
-        return renderTextWithEmoji("🪩", "Party Animal")
-    }
-
-    private func renderGuests(_ guests: Int) -> HStack<TupleView<(Text, Text)>> {
-        if guests < 4 {
-            return renderTextWithEmoji(guests > 0 ? "✅" : "🚫", "Guests")
-        }
-        return renderTextWithEmoji("🧑‍🤝‍🧑", "Loves Guests")
-    }
-
-    private func renderNoiseTolerance(_ noiseTolerance: Int) -> HStack<TupleView<(Text, Text)>> {
-        if noiseTolerance < 4 {
+    private func renderNoiseTolerance(_ noiseTolerance: Double) -> HStack<TupleView<(Text, Text)>> {
+        if noiseTolerance < 3 {
             return renderTextWithEmoji(noiseTolerance > 0 ? "✅" : "🚫", "Noise")
         }
         return renderTextWithEmoji("🔊", "Unbothered by noise")
+    }
+
+    private func renderPartying(_ partyFrequency: String) -> HStack<TupleView<(Text, Text)>> {
+        switch partyFrequency {
+        case "Always":
+            return renderTextWithEmoji("🪩", "Party Animal")
+        case "Sometimes":
+            return renderTextWithEmoji("✅", "Partying")
+        default:
+            return renderTextWithEmoji("🚫", "No Parties")
+        }
+    }
+
+    private func renderGuests(_ guestFrequency: String) -> HStack<TupleView<(Text, Text)>> {
+        switch guestFrequency {
+        case "Always":
+            return renderTextWithEmoji("🧑‍🤝‍🧑", "Loves Guests")
+        case "Sometimes":
+            return renderTextWithEmoji("✅", "Occasional Guests")
+        default:
+            return renderTextWithEmoji("🚫", "No Guests")
+        }
     }
 
     var profile: Model
@@ -82,43 +90,40 @@ struct ProfileCardView: View {
     var body: some View {
         VStack(alignment: .leading) {
             ZStack(alignment: .bottomLeading) {
-                Image(profile.imageId)
+                AsyncImage(url: URL(string: profile.profileImageURL)) { image in
+                    image
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: size.width, height: size.height * 0.65)
+                        .clipShape(Rectangle())
+                } placeholder: {
+                    ProgressView()
+                }
 
                 VStack(alignment: .leading) {
-                    Text("\(profile.firstName), \(profile.age)").font(.custom("Outfit-Bold", size: 32)).colorInvert()
+                    Text("\(profile.firstName), \(profile.age)")
+                        .font(.custom("Outfit-Bold", size: 32))
+                        .colorInvert()
                     Text(profile.gender).colorInvert()
-                    Text("\(profile.hasPlace ? "Spare room available" : "Looking for a room") in \(profile.neighbourhood)").colorInvert()
+                    Text("\(profile.roomState) in \(profile.location)").colorInvert()
                 }
-                .font(.custom("Outfit-Semibold", size: 16))
                 .padding()
                 .background(.ultraThinMaterial)
-                .clipShape(
-                    .rect(
-                        topLeadingRadius: 0,
-                        bottomLeadingRadius: 0,
-                        bottomTrailingRadius: 0,
-                        topTrailingRadius: 20
-                    )
-                )
             }
 
             VStack(alignment: .leading, spacing: 6) {
                 renderTextWithEmoji("🗣️", "“\(profile.bio)“")
                     .padding(.bottom)
-                renderTextWithEmoji(profile.preferences.smoker ? "🚬" : "🚭", "\(profile.preferences.smoker ? "" : "No") Smoking")
-                renderWakingHours(profile.preferences.wakingHours)
-                renderTextWithEmoji(profile.preferences.petsAllowed ? "🐾" : "🚫", "\(profile.preferences.petsAllowed ? "Yes" : "No") Pets")
-                renderNoiseTolerance(profile.preferences.noiseTolerance)
-                renderPartying(profile.preferences.partying)
-                renderGuests(profile.preferences.guests)
+                renderTextWithEmoji(profile.isSmoker ? "🚬" : "🚭", "\(profile.isSmoker ? "" : "No") Smoking")
+                renderTextWithEmoji(profile.petsOk ? "🐾" : "🚫", "\(profile.petsOk ? "Yes" : "No") Pets")
+                renderNoiseTolerance(profile.noiseTolerance)
+                renderPartying(profile.partyFrequency)
+                renderGuests(profile.guestFrequency)
             }
             .padding()
         }
-        .font(.custom("Outfit", size: 16))
-        .frame(width: size.width, height: size.height, alignment: .bottomLeading)
-        .padding(.bottom, 10)
         .background(Color.white)
-        .cornerRadius(25)
+        .cornerRadius(20)
         .shadow(color: isTopCard ? getShadowColor() : (isSecondCard && dragOffset.width != 0 ? Color.gray.opacity(0.2) : Color.clear), radius: 10, x: 0, y: 3)
     }
 
