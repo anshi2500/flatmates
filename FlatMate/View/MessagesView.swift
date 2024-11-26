@@ -37,14 +37,14 @@ struct MessagesView: View {
                             ForEach(viewModel.matches) { match in
                                 NavigationLink(
                                     destination: {
-                                        if let chatID = chatID {
+                                        if let chatID = match.chatID {
                                             MessagingView(
                                                 chatID: chatID,
                                                 currentUserID: "ruI196nXC1e06whgCwpBJiwOnNX2",
                                                 otherUserID: match.id
                                             )
                                         } else {
-                                            ProgressView("Loading chat...")
+                                            Text("Chat ID is not available.") // Fallback if chatID isn't ready
                                         }
                                     },
                                     label: {
@@ -54,16 +54,6 @@ struct MessagesView: View {
                                         )
                                     }
                                 )
-                                .onAppear {
-                                    viewModel.getChatID(user1: "ruI196nXC1e06whgCwpBJiwOnNX2", user2: match.id) { fetchedChatID in
-                                        if !fetchedChatID.isEmpty {
-                                            self.chatID = fetchedChatID
-                                        } else {
-                                            // Handle the error case (optional)
-                                            print("Failed to fetch chatID for user \(match.id)")
-                                        }
-                                    }
-                                }
                             }
                         }
                         .padding()
