@@ -6,11 +6,10 @@
 //
 
 import SwiftUI
-import Firebase
 
 struct MessagesView: View {
-    @State private var matches: [Match] = []
-    @State private var isLoading = true
+    @StateObject private var viewModel = MessagesViewModel()
+    @State private var chatID: String? = nil
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -19,13 +18,13 @@ struct MessagesView: View {
                 .font(.custom("Outfit-Bold", size: 38))
                 .foregroundColor(Color("primary"))
                 .padding(.horizontal)
-            
-            if isLoading {
+
+            if viewModel.isLoading {
                 // Loading Indicator
                 ProgressView("Loading matches...")
                     .padding()
             } else {
-                if matches.isEmpty {
+                if viewModel.matches.isEmpty {
                     // Empty State
                     Text("No matches found.")
                         .font(.subheadline)
@@ -35,11 +34,36 @@ struct MessagesView: View {
                     // List of Matches
                     ScrollView {
                         VStack(spacing: 16) {
-                            ForEach(matches) { match in
-                                MatchRow(
-                                    name: match.name,
-                                    imageURL: match.imageURL
+                            ForEach(viewModel.matches) { match in
+                                NavigationLink(
+                                    destination: {
+                                        if let chatID = chatID {
+                                            MessagingView(
+                                                chatID: chatID,
+                                                currentUserID: "ruI196nXC1e06whgCwpBJiwOnNX2",
+                                                otherUserID: match.id
+                                            )
+                                        } else {
+                                            ProgressView("Loading chat...")
+                                        }
+                                    },
+                                    label: {
+                                        MatchRow(
+                                            name: match.name,
+                                            imageURL: match.imageURL
+                                        )
+                                    }
                                 )
+                                .onAppear {
+                                    viewModel.getChatID(user1: "ruI196nXC1e06whgCwpBJiwOnNX2", user2: match.id) { fetchedChatID in
+                                        if !fetchedChatID.isEmpty {
+                                            self.chatID = fetchedChatID
+                                        } else {
+                                            // Handle the error case (optional)
+                                            print("Failed to fetch chatID for user \(match.id)")
+                                        }
+                                    }
+                                }
                             }
                         }
                         .padding()
@@ -49,16 +73,6 @@ struct MessagesView: View {
             Spacer()
         }
         .navigationTitle("Messages")
-        .onAppear {
-            loadMatches()
-        }
-    }
-
-    private func loadMatches() {
-        Match.fetchMatches { fetchedMatches in
-            self.matches = fetchedMatches
-            self.isLoading = false
-        }
     }
 }
 
