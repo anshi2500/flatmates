@@ -10,7 +10,7 @@
 import SwiftUI
 
 struct MessagingView: View {
-    @StateObject var viewModel: MessageViewModel // Dynamically created with currentUserID
+    @StateObject var viewModel: MessagingViewModel
     var chatID: String
     var currentUserID: String
     var otherUserID: String
@@ -21,13 +21,13 @@ struct MessagingView: View {
         self.chatID = chatID
         self.currentUserID = currentUserID
         self.otherUserID = otherUserID
-        _viewModel = StateObject(wrappedValue: MessageViewModel())
+        _viewModel = StateObject(wrappedValue: MessagingViewModel())
     }
 
     var body: some View {
         VStack {
             // Title row at the top
-            TitleRow()
+            TitleRow(userID: otherUserID)
 
             // Scrollable messages list
             ScrollViewReader { proxy in
@@ -65,7 +65,7 @@ struct MessagingView: View {
                 )
             }
         }
-        .background(Color("Gray"))
+        .background(Color(.white))
         // Displays all messages on appear
         .onAppear {
             print("MessagingView appeared for chatID: \(chatID)")

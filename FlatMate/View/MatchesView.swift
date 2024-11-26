@@ -16,7 +16,7 @@ struct MatchesView: View {
             Spacer()
         }
         .navigationTitle("Matches")
-    }
+    } 
 }
 
 #Preview {

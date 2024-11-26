@@ -8,7 +8,7 @@
 import Foundation
 import FirebaseFirestore
 
-class MessageViewModel: ObservableObject {
+class MessagingViewModel: ObservableObject {
     @Published var messages: [Message] = []
     @Published var errorMessage: String? // For error handling
 
