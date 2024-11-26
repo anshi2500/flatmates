@@ -105,12 +105,12 @@ struct SwipeCardsView: View {
                                             self.dragState.width = self.dragState.width > 0 ? 1000 : -1000
                                         }
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                            // Notify the parent view about the swipe
+                                            action(model) // <-- Call the action closure here
+
                                             self.model.removeTopCard()
                                             self.dragState = .zero
                                             self.cardRotation = 0
-
-                                            // Notify the parent view about the swipe
-                                            action(model) // <-- Call the action closure here
                                         }
                                     } else {
                                         withAnimation(.spring()) {
