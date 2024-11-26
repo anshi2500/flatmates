@@ -20,7 +20,7 @@ struct ProfileCardView: View {
         let bio: String
         let roomState: String
         let location: String
-        let profileImageURL: String
+        let profileImageURL: String? // Now optional
         let isSmoker: Bool
         let petsOk: Bool
         let noiseTolerance: Double
@@ -90,14 +90,25 @@ struct ProfileCardView: View {
     var body: some View {
         VStack(alignment: .leading) {
             ZStack(alignment: .bottomLeading) {
-                AsyncImage(url: URL(string: profile.profileImageURL)) { image in
-                    image
+                if let profileImageURL = profile.profileImageURL, let url = URL(string: profileImageURL) {
+                    AsyncImage(url: url) { image in
+                        image
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: size.width, height: size.height * 0.65)
+                            .clipShape(Rectangle())
+                    } placeholder: {
+                        ProgressView()
+                    }
+                } else {
+                    // Default placeholder for users without a profile image
+                    Image(systemName: "person.crop.circle.fill")
                         .resizable()
-                        .scaledToFill()
+                        .scaledToFit()
                         .frame(width: size.width, height: size.height * 0.65)
+                        .foregroundColor(.gray)
+                        .background(Color.gray.opacity(0.2))
                         .clipShape(Rectangle())
-                } placeholder: {
-                    ProgressView()
                 }
 
                 VStack(alignment: .leading) {
