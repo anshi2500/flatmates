@@ -7,6 +7,7 @@
 
 import Foundation
 import Firebase
+import FirebaseAuth
 
 struct Match: Identifiable {
     let id: String
@@ -21,6 +22,12 @@ struct Match: Identifiable {
     
     
     static func fetchMatches(completion: @escaping ([Match]) -> Void) {
+        guard let currentUserID = Auth.auth().currentUser?.uid else {
+                    print("Error: No authenticated user found.")
+                    completion([]) // Return an empty array if the user is not logged in
+                    return
+                }
+        
         let db = Firestore.firestore()
         let usersCollection = db.collection("users")
         let chatCollection = db.collection("chats")
@@ -33,7 +40,8 @@ struct Match: Identifiable {
             "rNF1Q1CPxad4RNxBFya28YVat3s2"
         ]
         
-        let currentUserID = "ruI196nXC1e06whgCwpBJiwOnNX2" // Replace with dynamically fetched userID
+        
+        
         let dispatchGroup = DispatchGroup()
         
         for matchID in matchIDs {

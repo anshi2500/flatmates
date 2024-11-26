@@ -6,39 +6,54 @@
 //
 
 import Foundation
+import FirebaseAuth
 
 class MessagesViewModel: ObservableObject {
     @Published var matches: [Match] = []
     @Published var isLoading: Bool = false
+    @Published var currentUserID: String? // Store the current user ID
     
     private let messageManager = MessageManager()
     
     init() {
+        guard let uid = Auth.auth().currentUser?.uid else {
+            print("Error: No authenticated user found during initialization.")
+            self.currentUserID = nil
+            return
+        }
+        self.currentUserID = uid
         loadMatches()
     }
     
     // Fetches matches and updates state
     private func loadMatches() {
-           isLoading = true
-           Match.fetchMatches { [weak self] fetchedMatches in
-               DispatchQueue.global().async {
-                   let updatedMatches = fetchedMatches.map { match -> Match in
-                       var matchWithChatID = match
-                       self?.getChatID(user1: "ruI196nXC1e06whgCwpBJiwOnNX2", user2: match.id) { chatID in
-                           DispatchQueue.main.async {
-                               matchWithChatID.chatID = chatID
-                           }
-                       }
-                       return matchWithChatID
-                   }
+        guard let currentUserID = self.currentUserID else {
+            print("Error: currentUserID is nil")
+            isLoading = false
+            return
+        }
+        
+        isLoading = true
+        
+        Match.fetchMatches { [weak self] fetchedMatches in
+            DispatchQueue.global().async {
+                let updatedMatches = fetchedMatches.map { match -> Match in
+                    var matchWithChatID = match
+                    self?.getChatID(user1: currentUserID, user2: match.id) { chatID in
+                        DispatchQueue.main.async {
+                            matchWithChatID.chatID = chatID
+                        }
+                    }
+                    return matchWithChatID
+                }
 
-                   DispatchQueue.main.async {
-                       self?.matches = updatedMatches
-                       self?.isLoading = false
-                   }
-               }
-           }
-       }
+                DispatchQueue.main.async {
+                    self?.matches = updatedMatches
+                    self?.isLoading = false
+                }
+            }
+        }
+    }
     
     // Function to fetch or create a chatID asynchronously
     func getChatID(user1: String, user2: String, completion: @escaping (String) -> Void) {

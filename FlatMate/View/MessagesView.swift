@@ -6,10 +6,13 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 struct MessagesView: View {
     @StateObject private var viewModel = MessagesViewModel()
     @State private var chatID: String? = nil
+    
+    let currentUserID = Auth.auth().currentUser?.uid
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -40,7 +43,7 @@ struct MessagesView: View {
                                         if let chatID = match.chatID {
                                             MessagingView(
                                                 chatID: chatID,
-                                                currentUserID: "ruI196nXC1e06whgCwpBJiwOnNX2",
+                                                currentUserID: viewModel.currentUserID ?? "",
                                                 otherUserID: match.id
                                             )
                                         } else {
