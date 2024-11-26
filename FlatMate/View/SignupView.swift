@@ -71,7 +71,22 @@ struct SignupView: View {
                     }})
                 }
                 .padding(.horizontal, 20)
-
+                .padding(.bottom, 20)
+                
+                // Terms of Service and Privacy Policy
+                VStack {
+                    (
+                        Text("ⓘ By tapping 'Sign up', you agree to our ")
+                        + Text("Terms of Service").underline()
+                        + Text(" and ")
+                        + Text("Privacy Policy").underline()
+                        + Text(".")
+                    )
+                    .multilineTextAlignment(.center)
+                }
+                .font(.custom("Outfit-Regular", size: 15))
+                .foregroundColor(.primary)
+                .padding(.horizontal, 15)
                 Spacer()
 
                 // Already have an account? Log in button
