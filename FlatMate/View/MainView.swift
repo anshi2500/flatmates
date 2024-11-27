@@ -22,13 +22,7 @@ struct MainView: View {
                     .tag(BottomNavigationBar.Tab.home)
 
                 // Search Tab
-                MatchesView()
-                    .tabItem {
-                        tabIcon(for: .search)
-                        Text("Search")
-                    }
-                    .tag(BottomNavigationBar.Tab.search)
-
+                
                 // Chat Tab
                 MessagesView()
                     .tabItem {
