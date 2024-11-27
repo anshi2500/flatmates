@@ -16,11 +16,11 @@ struct TitleRow: View {
     var body: some View {
         ZStack {
             LinearGradient(
-                gradient: Gradient(colors: [Color.white, Color("chatPrimary")]),
+                gradient: Gradient(colors: [Color.white, Color("primary")]),
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
-                .ignoresSafeArea(edges: .top)
+            .ignoresSafeArea(edges: .top)
             HStack(spacing: 20) {
                 // Load the image from the provided URL or use a placeholder if it fails
                 AsyncImage(url: URL(string: imageURL)) { phase in
@@ -47,15 +47,22 @@ struct TitleRow: View {
                 
                 VStack(alignment: .leading) {
                     Text(name)
-                        .font(.title).bold()
+                        .font(.custom("Outfit-SemiBold", size: 28))
                     
                     Text("Online")
-                        .font(.caption)
-                        .foregroundColor(.black)
+                        .font(.custom("Outfit-Regular", size: 12))
                 }
+                .foregroundColor(.black)
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .padding()
+            
+            VStack {
+                Spacer()
+                Rectangle()
+                    .frame(height: 1) // Thickness of the border
+                    .foregroundColor(.gray) // Color of the border
+            }
         }
         .frame(height: 80)
         .onAppear {
