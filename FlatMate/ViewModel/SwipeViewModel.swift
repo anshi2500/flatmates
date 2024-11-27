@@ -18,7 +18,21 @@ class SwipeViewModel: ObservableObject {
     }
 
     func handleSwipe(userID: String, targetUserID: String, isLike: Bool, completion: @escaping (Bool) -> Void) {
-        matchService.swipe(userID: userID, targetUserID: targetUserID, isLike: isLike, completion: completion)
+        // Update the match service
+        matchService.swipe(userID: userID, targetUserID: targetUserID, isLike: isLike) { isMatch in
+            // Step 1: Update Firestore to track swiped profile
+            let db = Firestore.firestore()
+            db.collection("users").document(userID).updateData([
+                "swipedProfiles": FieldValue.arrayUnion([targetUserID])
+            ]) { error in
+                if let error = error {
+                    print("Error updating swiped profiles: \(error.localizedDescription)")
+                }
+            }
+
+            // Step 2: Call the completion handler
+            completion(isMatch)
+        }
     }
 
     func fetchProfiles(currentUserID: String) async {
@@ -26,22 +40,27 @@ class SwipeViewModel: ObservableObject {
         await MainActor.run { self.isLoading = true } // Update UI on main thread
 
         do {
-            // Firestore query to fetch all users except the current user
+            // Step 1: Fetch the user's swiped profiles
+            let userDoc = try await db.collection("users").document(currentUserID).getDocument()
+            let swipedProfiles = userDoc.data()?["swipedProfiles"] as? [String] ?? []
+
+            // Step 2: Fetch all profiles except the current user
             let snapshot = try await db.collection("users")
-                .whereField("id", isNotEqualTo: currentUserID)
+                .whereField("id", isNotEqualTo: currentUserID) // Exclude current user
                 .getDocuments()
 
-            // Decode profiles into the model
+            // Step 3: Decode profiles and filter out swiped profiles locally
             let profiles = snapshot.documents.compactMap { doc -> ProfileCardView.Model? in
                 do {
-                    return try doc.data(as: ProfileCardView.Model.self)
+                    let profile = try doc.data(as: ProfileCardView.Model.self)
+                    return swipedProfiles.contains(profile.id) ? nil : profile
                 } catch {
                     print("Error decoding profile: \(error.localizedDescription)")
                     return nil
                 }
             }
 
-            // Update UI on main thread
+            // Step 4: Update UI on main thread
             await MainActor.run {
                 self.profiles = profiles
                 self.isLoading = false
