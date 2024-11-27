@@ -23,14 +23,14 @@ struct MessageField: View {
                 Image(systemName: "paperplane.fill")
                     .foregroundColor(.white)
                     .padding(10)
-                    .background(Color("chatPrimary"))
+                    .background(Color("primary"))
                     .cornerRadius(50)
             }
         }
         .animation(.easeInOut, value: message.isEmpty)
         .padding(.horizontal)
         .padding(.vertical, 10)
-        .background(Color("chatSecondary"))
+        .background(Color("primaryBackground"))
         .cornerRadius(50)
         .padding()
     }
