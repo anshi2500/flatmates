@@ -47,9 +47,7 @@ struct YouMatchedView: View {
     var thisUser: User
     var otherUser: ProfileCardView.Model
 
-    @State private var chatID: String? = nil
-    @State private var isChatLoading: Bool = false
-    @State private var navigateToMessagingView = false
+    @State private var navigateToMessagesView = false
 
     var body: some View {
         NavigationStack {
@@ -83,51 +81,18 @@ struct YouMatchedView: View {
                         type: .outline
                     )
                     ButtonView(
-                        title: "Send Message",
+                        title: "Go to Matches",
                         action: {
-                            if let chatID = chatID {
-                                print("Navigating to chatID: \(chatID)")
-                                navigateToMessagingView = true
-                            } else {
-                                print("ChatID not yet loaded.")
-                            }
+                            navigateToMessagesView = true
                         }
                     )
-                    .disabled(chatID == nil || isChatLoading)
                 }
             }
             .padding()
-            .onAppear {
-                fetchChatID() // Fetch chatID on appear
-            }
-            .navigationDestination(isPresented: $navigateToMessagingView) {
-                if let chatID = chatID {
-                    MessagingView(
-                        chatID: chatID,
-                        currentUserID: thisUser.id,
-                        otherUserID: otherUser.id
-                    )
-                } else {
-                    Text("Loading chat...")
-                }
+            .navigationDestination(isPresented: $navigateToMessagesView) {
+                MessagesView()
             }
         }
     }
 
-    private func fetchChatID() {
-        guard chatID == nil else { return } // Prevent duplicate calls
-        isChatLoading = true
-
-        ChatUtilities.getOrCreateChatID(user1: thisUser.id, user2: otherUser.id) { result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let fetchedChatID):
-                    self.chatID = fetchedChatID
-                case .failure(let error):
-                    print("Error fetching or creating chatID: \(error.localizedDescription)")
-                }
-                self.isChatLoading = false
-            }
-        }
-    }
 }
