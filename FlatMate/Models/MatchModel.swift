@@ -119,7 +119,7 @@ struct Match: Identifiable {
         
         // Query to check if a chat exists for the given users
         chatCollection
-            .whereField("participants", arrayContains: user1)
+            .whereField("users", arrayContains: user1)
             .getDocuments { snapshot, error in
                 if let error = error {
                     print("Error fetching chatID: \(error)")
@@ -130,7 +130,7 @@ struct Match: Identifiable {
                 if let documents = snapshot?.documents {
                     for document in documents {
                         let data = document.data()
-                        if let participants = data["participants"] as? [String],
+                        if let participants = data["users"] as? [String],
                            participants.contains(user2) {
                             print("Found existing chatID for \(user1) and \(user2)")
                             completion(document.documentID)
@@ -149,7 +149,7 @@ struct Match: Identifiable {
         let chatCollection = db.collection("chats")
         
         let chatData: [String: Any] = [
-            "participants": [user1, user2],
+            "users": [user1, user2],
             "createdAt": FieldValue.serverTimestamp()
         ]
         

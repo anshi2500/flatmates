@@ -19,7 +19,7 @@ struct ChatUtilities {
         
         // Query to check if a chat already exists for the given users
         chatCollection
-            .whereField("participants", arrayContains: user1)
+            .whereField("users", arrayContains: user1)
             .getDocuments { snapshot, error in
                 if let error = error {
                     completion(.failure(error))
@@ -30,7 +30,7 @@ struct ChatUtilities {
                 if let documents = snapshot?.documents {
                     for document in documents {
                         let data = document.data()
-                        if let participants = data["participants"] as? [String], participants.contains(user2) {
+                        if let participants = data["users"] as? [String], participants.contains(user2) {
                             completion(.success(document.documentID)) // Found existing chatID
                             return
                         }
@@ -51,7 +51,7 @@ struct ChatUtilities {
         let chatCollection = db.collection("chats")
         
         let chatData: [String: Any] = [
-            "participants": [user1, user2],
+            "users": [user1, user2],
             "createdAt": FieldValue.serverTimestamp()
         ]
         

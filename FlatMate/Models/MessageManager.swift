@@ -29,6 +29,7 @@ class MessageManager: ObservableObject {
                 error in
                 if let error = error {
                     completion(.failure(error))
+                    print("Message error")
                 } else {
                     completion(.success(()))
                 }
@@ -121,34 +122,35 @@ class MessageManager: ObservableObject {
     }
     
     func getOrCreateChatID(user1: String, user2: String, completion: @escaping (Result<String, Error>) -> Void) {
-        // Ensure user IDs are sorted to maintain consistent chatID order
         let userIDs = [user1, user2].sorted()
-        
-        // Query to check if a chat between the two users already exists
         let query = db.collection("chats").whereField("users", isEqualTo: userIDs)
         
         query.getDocuments { snapshot, error in
             if let error = error {
-                completion(.failure(error)) // Handle Firestore errors
+                completion(.failure(error))
             } else if let documents = snapshot?.documents, !documents.isEmpty {
-                // If chat exists, return the chatID of the first match
                 if let document = documents.first {
                     completion(.success(document.documentID))
                 }
             } else {
-                // Chat does not exist, create a new chat
                 let chatData: [String: Any] = [
                     "users": userIDs,
                     "createdAt": FieldValue.serverTimestamp()
                 ]
                 
-                let newChatRef = db.collection("chats").document() // Auto-generate a new chatID
+                let newChatRef = db.collection("chats").document()
                 
                 newChatRef.setData(chatData) { error in
                     if let error = error {
-                        completion(.failure(error)) // Handle Firestore errors
+                        completion(.failure(error))
                     } else {
-                        completion(.success(newChatRef.documentID)) // Return the new chatID
+                        newChatRef.getDocument { _, docError in
+                            if let docError = docError {
+                                completion(.failure(docError))
+                            } else {
+                                completion(.success(newChatRef.documentID))
+                            }
+                        }
                     }
                 }
             }
