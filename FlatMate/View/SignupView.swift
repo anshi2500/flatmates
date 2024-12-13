@@ -27,14 +27,14 @@ struct SignupView: View {
                         .scaledToFit()
                         .frame(height: 103)
                         .padding(.top, 15)
-                        .padding(.bottom, 20)
+                        .padding(.bottom, 18)
                         .padding(.horizontal, 35)
                     
                     // Signup Title
                     Text("Create Your Account")
                         .font(.custom("Outfit-Bold", size: 28))
                         .multilineTextAlignment(.center)
-                        .padding(.vertical, 20)
+                        .padding(.bottom, 22)
                     
                     // Input Fields
                     VStack {
@@ -51,8 +51,7 @@ struct SignupView: View {
                                 .multilineTextAlignment(.leading)
                                 .opacity(errorMessage == nil ? 0 : 1)
                         }
-                        .frame(height: 15) // fixed height for the error area
-                        .padding(.bottom, 5)
+                        .frame(height: 1) // fixed height for the error area
                         
                         // Signup Button
                         ButtonView(title: "Sign up", action: {Task {
@@ -92,7 +91,7 @@ struct SignupView: View {
                     .font(.custom("Outfit-Regular", size: 15))
                     .foregroundColor(.primary)
                     .padding(.horizontal, 15)
-                    .padding(.bottom, 45)
+                    .padding(.bottom, 35)
                     
                     // Already have an account? Log in button
                     Button(action: {
