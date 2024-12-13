@@ -76,7 +76,7 @@ This project is licensed under the GNU Affero General Public License v3.0 - see 
 
 ## Contributing
 
-We welcome contributions to FlatMate! Please feel free to submit issues and pull requests.
+We welcome contributions to FlatMates! Please feel free to submit issues and pull requests.
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
