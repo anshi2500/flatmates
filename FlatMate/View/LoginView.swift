@@ -54,20 +54,21 @@ struct LoginView: View {
                         }
                         
                         // Error Message Display
-                        if let errorMessage = errorMessage {
-                            Text(errorMessage)
+                        ZStack {
+                            Text(errorMessage ?? "")
                                 .font(.custom("Outfit-Regular", size: 14))
                                 .foregroundColor(.red)
-                                .frame(maxWidth: .infinity, alignment: .leading) // Aligns the text to the left
-                                .padding(.bottom, 10)
+                                .multilineTextAlignment(.leading)
+                                .opacity(errorMessage == nil ? 0 : 1)
                         }
+                        .frame(height: 15) // fixed height for the error area
+                        .padding(.bottom, 10)
                         
                         HStack {
                             ButtonView(title: "Forgot Password?", action: {
                                 navigateToResetPassword = true
                             }, type: .link)
                         }
-                        .padding(.top, errorMessage == nil ? 20 : 5)
                         .padding(.bottom, 20)
                         .navigationDestination(isPresented: $navigateToResetPassword) {
                             ResetPasswordView().environmentObject(viewModel)

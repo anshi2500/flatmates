@@ -44,13 +44,15 @@ struct SignupView: View {
                         InputView(text: $confirmPassword, title: "Confirm Password", placeholder: "***************", isSecureField: true)
                         
                         // Error Message Display
-                        if let errorMessage = errorMessage {
-                            Text(errorMessage)
+                        ZStack {
+                            Text(errorMessage ?? "")
                                 .font(.custom("Outfit-Regular", size: 14))
                                 .foregroundColor(.red)
                                 .multilineTextAlignment(.leading)
-                                .padding(.bottom, 10)
+                                .opacity(errorMessage == nil ? 0 : 1)
                         }
+                        .frame(height: 15) // fixed height for the error area
+                        .padding(.bottom, 5)
                         
                         // Signup Button
                         ButtonView(title: "Sign up", action: {Task {
