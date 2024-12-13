@@ -14,6 +14,7 @@ struct SignupView: View {
     @State private var password = ""
     @State private var confirmPassword = ""
     @State private var errorMessage: String?
+    @State private var showPasswordRules = false
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var viewModel: AuthViewModel
 
@@ -39,7 +40,47 @@ struct SignupView: View {
                 VStack {
                     InputView(text: $username, title: "Username", placeholder: "username", isSecureField: false)
                     InputView(text: $email, title: "Email Address", placeholder: "name@example.com", isSecureField: false)
-                    InputView(text: $password, title: "Password", placeholder: "***************", isSecureField: true)
+                    
+                    // Password Field with Tooltip
+                    VStack(alignment: .leading) {
+                        HStack {
+                            Text("Password")
+                                    .font(.system(size: 16, weight: .light))
+                            
+                            Button(action: {
+                                showPasswordRules.toggle()
+                            }) {
+                                Image(systemName: "questionmark.circle")
+                                    .foregroundColor(.gray)
+                                    .padding(.leading, 5)
+                            }
+                            .popover(isPresented: $showPasswordRules) {
+                                VStack(alignment: .leading) {
+                                    Spacer()
+                                    Text("Password Requirements")
+                                        .font(.headline)
+                                        .padding(.bottom, 5)
+
+                                    // Use a scrollable VStack if content exceeds height
+                                    ScrollView {
+                                        VStack(alignment: .leading, spacing: 8) {
+                                            Text("• Password must be at least 12 characters long.")
+                                            Text("• Password must include at least one uppercase letter.")
+                                            Text("• Password must include at least one lowercase letter.")
+                                            Text("• Password must include at least one number.")
+                                            Text("• Password must include at least one special character.")
+                                        }
+                                        .padding(.horizontal, 15) // Add some horizontal padding to the text
+                                    }
+                                    .frame(height: 250)
+                                }
+                                .padding()
+                                .frame(width: 350, height: 400)
+                            }
+                        }
+                        InputView(text: $password, title: "", placeholder: "***************", isSecureField: true)
+                    }
+
                     InputView(text: $confirmPassword, title: "Confirm Password", placeholder: "***************", isSecureField: true)
                     
                     // Error Message Display
