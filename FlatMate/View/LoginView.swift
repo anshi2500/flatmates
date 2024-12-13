@@ -38,21 +38,20 @@ struct LoginView: View {
                 // Input Fields
                 VStack {
                     InputView(text: $email, title: "Email Address", placeholder: "name@example.com", isSecureField: false)
-                    
+
                     // Password Input with Show/Hide Button
-                    ZStack {
+                    ZStack(alignment: .trailingLastTextBaseline) {
                         InputView(text: $password, title: "Password", placeholder: "***************", isSecureField: !isPasswordVisible)
-                        
+
                         Button(action: {
                             isPasswordVisible.toggle()  // Toggle password visibility
                         }) {
                             Image(systemName: isPasswordVisible ?  "eye": "eye.slash")  // Toggle between eye and eye.slash icons
                                 .foregroundColor(.gray)
-                                .padding(.trailing, 10)
-                                .padding(.bottom, 8)   
                         }
+                        .padding()
                     }
-                    
+
                     // Error Message Display
                     if let errorMessage = errorMessage {
                         Text(errorMessage)
@@ -135,5 +134,5 @@ struct LoginView: View {
 }
 
 #Preview {
-    LoginView()
+    LoginView().environmentObject(AuthViewModel())
 }
