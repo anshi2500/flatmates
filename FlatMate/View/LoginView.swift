@@ -14,6 +14,7 @@ struct LoginView: View {
     @State private var errorMessage: String?
     @State private var navigateToResetPassword = false
     @State private var resetEmail = ""
+    @State private var isPasswordVisible = false  // Track password visibility
     @EnvironmentObject var viewModel: AuthViewModel
 
     var body: some View {
@@ -37,8 +38,20 @@ struct LoginView: View {
                 // Input Fields
                 VStack {
                     InputView(text: $email, title: "Email Address", placeholder: "name@example.com", isSecureField: false)
-                    InputView(text: $password, title: "Password", placeholder: "***************", isSecureField: true)
-                    
+
+                    // Password Input with Show/Hide Button
+                    ZStack(alignment: .trailingLastTextBaseline) {
+                        InputView(text: $password, title: "Password", placeholder: "***************", isSecureField: !isPasswordVisible)
+
+                        Button(action: {
+                            isPasswordVisible.toggle()  // Toggle password visibility
+                        }) {
+                            Image(systemName: isPasswordVisible ?  "eye": "eye.slash")  // Toggle between eye and eye.slash icons
+                                .foregroundColor(.gray)
+                        }
+                        .padding()
+                    }
+
                     // Error Message Display
                     if let errorMessage = errorMessage {
                         Text(errorMessage)
@@ -49,7 +62,6 @@ struct LoginView: View {
                     }
                     
                     HStack {
-                        Spacer()
                         ButtonView(title: "Forgot Password?", action: {
                             navigateToResetPassword = true
                         }, type: .link)
@@ -122,5 +134,5 @@ struct LoginView: View {
 }
 
 #Preview {
-    LoginView()
+    LoginView().environmentObject(AuthViewModel())
 }
