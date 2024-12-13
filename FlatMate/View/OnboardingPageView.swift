@@ -178,13 +178,15 @@ struct OnboardingPageView: View {
                 let ageComponents = calendar.dateComponents([.year], from: dob, to: now)
                 let age = ageComponents.year ?? 0
             
-            return dob.timeIntervalSinceNow < -100 && age >= 18 && gender != "" && bio != ""
+                return dob.timeIntervalSinceNow < -100 && age >= 18 && gender != "" && bio != ""
             case 2:
-                return roomState != ""
+                return roomState != Constants.PickerOptions.roomStates[0]
             case 3:
                 return true
             case 4:
-                return partyFreq != "" && guestFreq != ""
+                return partyFrequency != Constants.PickerOptions.frequencies[0] && guestFrequency != Constants.PickerOptions.frequencies[0]
+            case 5:
+                return location != ""
             default:
                 return false
         }
