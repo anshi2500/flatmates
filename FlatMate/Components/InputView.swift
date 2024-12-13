@@ -15,6 +15,7 @@ struct InputFieldStyle: ViewModifier {
     func body(content: Content) -> some View {
         content
             .font(.custom("Outfit-ExtraLight", size: 17))
+            .frame(minHeight: 28)
             .foregroundColor(.black)
             .padding(.all, 12)
             .background(Color("primaryBackground"))
@@ -33,7 +34,6 @@ struct InputView: View {
         VStack(alignment: .leading) {
             Text(title)
                 .font(.custom("Outfit-ExtraLight", size: 17))
-                .padding(.bottom, -5)
 
             // Ternary operator to decide between SecureField and TextField
             Group {
@@ -43,10 +43,11 @@ struct InputView: View {
                     TextField(placeholder, text: $text).focused($focusedField, equals: .textField)
                 }
             }
+            .autocorrectionDisabled(true)
             .autocapitalization(.none)
             .modifier(InputFieldStyle())
         }
-        .frame(maxWidth: .infinity, minHeight: 48) // Adjusted frame
+        .frame(maxWidth: .infinity) // Adjusted frame
         .onChange(of: focusedField) { focusedField = isSecureField ? .textField : .secureField }
     }
 }
