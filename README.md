@@ -51,7 +51,7 @@ FlatMates is a modern iOS application designed to help users find compatible roo
 
 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/FlatMate.git
+git clone https://github.com/anidion/FlatMates.git
 ```
 
 2. Install dependencies
