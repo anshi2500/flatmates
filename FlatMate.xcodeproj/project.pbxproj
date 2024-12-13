@@ -24,6 +24,7 @@
 		1C2AFA962CE6F4AD0085E62B /* FirebaseFunctionsCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = 1C2AFA952CE6F4AD0085E62B /* FirebaseFunctionsCombine-Community */; };
 		1C2AFA982CE6F4AD0085E62B /* FirebaseInAppMessaging-Beta in Frameworks */ = {isa = PBXBuildFile; productRef = 1C2AFA972CE6F4AD0085E62B /* FirebaseInAppMessaging-Beta */; };
 		1C2AFA9A2CE6F4AD0085E62B /* FirebaseInstallations in Frameworks */ = {isa = PBXBuildFile; productRef = 1C2AFA992CE6F4AD0085E62B /* FirebaseInstallations */; };
+		1C2AFD1A2CEAD5A60085E62B /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 1C2AFD192CEAD5A60085E62B /* FirebaseStorage */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -96,6 +97,7 @@
 				1C2AFA9A2CE6F4AD0085E62B /* FirebaseInstallations in Frameworks */,
 				1C2AFA962CE6F4AD0085E62B /* FirebaseFunctionsCombine-Community in Frameworks */,
 				1C2AFA822CE6F4AD0085E62B /* FirebaseAppDistribution-Beta in Frameworks */,
+				1C2AFD1A2CEAD5A60085E62B /* FirebaseStorage in Frameworks */,
 				1C2AFA7E2CE6F4AD0085E62B /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */,
 				1C2AFA982CE6F4AD0085E62B /* FirebaseInAppMessaging-Beta in Frameworks */,
 				1C2AFA862CE6F4AD0085E62B /* FirebaseAuthCombine-Community in Frameworks */,
@@ -128,6 +130,7 @@
 				1C0DD0152CC313DC00BE79A3 /* FlatMate */,
 				1C0DD0262CC313DE00BE79A3 /* FlatMateTests */,
 				1C0DD0302CC313DE00BE79A3 /* FlatMateUITests */,
+				1C2AFD182CEAD5A60085E62B /* Frameworks */,
 				1C0DD0142CC313DC00BE79A3 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -140,6 +143,13 @@
 				1C0DD02D2CC313DE00BE79A3 /* FlatMateUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		1C2AFD182CEAD5A60085E62B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -179,6 +189,7 @@
 				1C2AFA952CE6F4AD0085E62B /* FirebaseFunctionsCombine-Community */,
 				1C2AFA972CE6F4AD0085E62B /* FirebaseInAppMessaging-Beta */,
 				1C2AFA992CE6F4AD0085E62B /* FirebaseInstallations */,
+				1C2AFD192CEAD5A60085E62B /* FirebaseStorage */,
 			);
 			productName = FlatMate;
 			productReference = 1C0DD0132CC313DC00BE79A3 /* FlatMate.app */;
@@ -735,6 +746,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 1C2AFA782CE6F4AD0085E62B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseInstallations;
+		};
+		1C2AFD192CEAD5A60085E62B /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1C2AFA782CE6F4AD0085E62B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

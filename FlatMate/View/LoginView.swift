@@ -20,11 +20,13 @@ struct LoginView: View {
         NavigationView {
             VStack {
                 // Logo Image
-                Image("Logo")
+                Image("Logo Straight Blue")
                     .resizable()
                     .scaledToFit()
                     .frame(height: 103)
+                    .padding(.top, 15)
                     .padding(.bottom, 20)
+                    .padding(.horizontal, 35)
                 
                 // Welcome Text
                 Text("Welcome Back")
@@ -79,6 +81,22 @@ struct LoginView: View {
                     }})
                 }
                 .padding(.horizontal, 20)
+                .padding(.bottom, 20)
+                
+                // Terms of Service and Privacy Policy
+                VStack {
+                    (
+                        Text("ⓘ By tapping 'Log In', you agree to our ")
+                        + Text("Terms of Service").underline()
+                        + Text(" and ")
+                        + Text("Privacy Policy").underline()
+                        + Text(".")
+                    )
+                    .multilineTextAlignment(.center)
+                }
+                .font(.custom("Outfit-Regular", size: 15))
+                .foregroundColor(.primary)
+                .padding(.horizontal, 15)
                 
                 Spacer()
                 

@@ -12,13 +12,17 @@ struct ContentView: View {
     
     var body: some View {
         Group {
-            if let userSession = viewModel.userSession {
+            if viewModel.userSession != nil {
                 if viewModel.hasCompletedOnboarding {
                     MainView()
                 } else {
                     OnboardingPageView(onComplete: {
                         Task {
-                            try? await viewModel.completeOnboarding()
+                            do {
+                                try await viewModel.completeOnboarding() // Update Firebase and ViewModel
+                            } catch {
+                                print("DEBUG: Failed to mark onboarding as complete: \(error)")
+                            }
                         }
                     })
                 }
@@ -27,6 +31,9 @@ struct ContentView: View {
                     LandingPageView()
                 }
             }
+        }
+        .onAppear {
+            print("ContentView appeared")
         }
     }
 }
