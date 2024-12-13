@@ -75,7 +75,7 @@ struct SignupView: View {
                                     .frame(height: 250)
                                 }
                                 .padding()
-                                .frame(width: 350, height: 400)
+                                .presentationCompactAdaptation(.popover)
                             }
                         }
                         InputView(text: $password, title: "", placeholder: "***************", isSecureField: true)
