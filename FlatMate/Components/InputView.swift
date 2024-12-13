@@ -34,6 +34,7 @@ struct InputView: View {
         VStack(alignment: .leading) {
             Text(title)
                 .font(.custom("Outfit-ExtraLight", size: 17))
+                .padding(.bottom, -5)
 
             // Ternary operator to decide between SecureField and TextField
             Group {
