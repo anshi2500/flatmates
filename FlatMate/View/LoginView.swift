@@ -40,7 +40,7 @@ struct LoginView: View {
                     InputView(text: $email, title: "Email Address", placeholder: "name@example.com", isSecureField: false)
                     
                     // Password Input with Show/Hide Button
-                    HStack {
+                    ZStack {
                         InputView(text: $password, title: "Password", placeholder: "***************", isSecureField: !isPasswordVisible)
                         
                         Button(action: {
@@ -48,7 +48,8 @@ struct LoginView: View {
                         }) {
                             Image(systemName: isPasswordVisible ?  "eye": "eye.slash")  // Toggle between eye and eye.slash icons
                                 .foregroundColor(.gray)
-                                .padding()
+                                .padding(.trailing, 10)
+                                .padding(.bottom, 8)   
                         }
                     }
                     
