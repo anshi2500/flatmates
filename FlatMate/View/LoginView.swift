@@ -27,14 +27,14 @@ struct LoginView: View {
                         .scaledToFit()
                         .frame(height: 103)
                         .padding(.top, 15)
-                        .padding(.bottom, 20)
+                        .padding(.bottom, 18)
                         .padding(.horizontal, 35)
                     
                     // Welcome Text
                     Text("Welcome Back")
                         .font(.custom("Outfit-Bold", size: 28))
                         .multilineTextAlignment(.center)
-                        .padding(.vertical, 20)
+                        .padding(.bottom, 22)
                     
                     // Input Fields
                     VStack {
@@ -65,11 +65,11 @@ struct LoginView: View {
                         .padding(.bottom, 10)
                         
                         HStack {
+                            Spacer()
                             ButtonView(title: "Forgot Password?", action: {
                                 navigateToResetPassword = true
                             }, type: .link)
                         }
-                        .padding(.bottom, 20)
                         .navigationDestination(isPresented: $navigateToResetPassword) {
                             ResetPasswordView().environmentObject(viewModel)
                         }
@@ -111,7 +111,7 @@ struct LoginView: View {
                     .font(.custom("Outfit-Regular", size: 15))
                     .foregroundColor(.primary)
                     .padding(.horizontal, 15)
-                    .padding(.bottom, 45)
+                    .padding(.bottom, 35)
                     
                     
                     
