@@ -101,16 +101,17 @@ struct SwipeCardsView: View {
 
                                         model.updateTopCardSwipeDirection(swipeDirection)
 
-                                        withAnimation(.easeOut(duration: 0.5)) {
+                                        // Send card offscreen
+                                        withAnimation(.easeOut(duration: 0.15)) {
                                             self.dragState.width = self.dragState.width > 0 ? 1000 : -1000
-                                        }
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                            // Notify the parent view about the swipe
-                                            action(model) // <-- Call the action closure here
-
-                                            self.model.removeTopCard()
-                                            self.dragState = .zero
                                             self.cardRotation = 0
+                                        }
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                            self.dragState = .zero
+
+                                            // Notify the parent view about the swipe
+                                            action(model)
+                                            self.model.removeTopCard()
                                         }
                                     } else {
                                         withAnimation(.spring()) {
