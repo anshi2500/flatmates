@@ -9,20 +9,19 @@ import SwiftUI
 
 struct MainView: View {
     @State private var selectedTab: BottomNavigationBar.Tab = .home
-
+    @State private var navigateToMessagesView: Bool = false
+    
     var body: some View {
         NavigationView {
             TabView(selection: $selectedTab) {
                 // Home Tab
-                SwipePageView()
+                SwipePageView(navigateToMessagesView: $navigateToMessagesView)
                     .tabItem {
                         tabIcon(for: .home)
                         Text("Home")
                     }
                     .tag(BottomNavigationBar.Tab.home)
 
-                // Search Tab
-                
                 // Chat Tab
                 MessagesView()
                     .tabItem {
@@ -39,13 +38,19 @@ struct MainView: View {
                     }
                     .tag(BottomNavigationBar.Tab.profile)
             }
+            .onChange(of: navigateToMessagesView) { newValue in
+                if newValue {
+                    selectedTab = .chat
+                    navigateToMessagesView = false  // Reset the state after navigation
+                }
+            }
         }
     }
 
     @ViewBuilder
     private func tabIcon(for tab: BottomNavigationBar.Tab) -> some View {
-        let color = Color(red: 255 / 255, green: 0, blue: 0) // Red color for selected icon
-
+        let color = Color("primary") // Using your app's color asset
+        
         switch tab {
         case .home:
             Image(systemName: selectedTab == .home ? "house.fill" : "house")
@@ -70,7 +75,6 @@ struct MainView: View {
         }
     }
 }
-
 
 #Preview {
     MainView()

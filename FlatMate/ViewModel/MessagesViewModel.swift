@@ -1,10 +1,12 @@
 import Foundation
 import FirebaseAuth
+import FirebaseFirestore
 
 class MessagesViewModel: ObservableObject {
     @Published var matches: [Match] = []
     @Published var isLoading: Bool = false
-    @Published var currentUserID: String? // Store the current user ID
+    @Published var currentUserID: String?
+    private let chatUtilities = ChatUtilities()
     
     init() {
         guard let uid = Auth.auth().currentUser?.uid else {
@@ -16,7 +18,6 @@ class MessagesViewModel: ObservableObject {
         loadMatches()
     }
     
-    // Fetches matches and updates state
     func loadMatches() {
         guard let currentUserID = self.currentUserID else {
             print("Error: currentUserID is nil")
@@ -27,25 +28,48 @@ class MessagesViewModel: ObservableObject {
         isLoading = true
         
         Match.fetchMatches { [weak self] fetchedMatches in
+            guard let self = self else { return }
+            
             DispatchQueue.global().async {
-                let updatedMatches = fetchedMatches.map { match -> Match in
-                    var matchWithChatID = match
+                let dispatchGroup = DispatchGroup()
+                var updatedMatches = fetchedMatches
+                
+                // Process each match to get/create chat IDs
+                for (index, match) in fetchedMatches.enumerated() {
+                    dispatchGroup.enter()
                     
-                    // Use MatchModel's fetchChatID directly
-                    Match.fetchChatID(user1: currentUserID, user2: match.id) { chatID in
-                        DispatchQueue.main.async {
-                            matchWithChatID.chatID = chatID
+                    ChatUtilities.getOrCreateChatID(user1: currentUserID, user2: match.id) { result in
+                        switch result {
+                        case .success(let chatID):
+                            updatedMatches[index] = Match(
+                                id: match.id,
+                                name: match.name,
+                                imageURL: match.imageURL,
+                                chatID: chatID
+                            )
+                        case .failure(let error):
+                            print("Error getting/creating chatID: \(error.localizedDescription)")
                         }
+                        dispatchGroup.leave()
                     }
-                    
-                    return matchWithChatID
                 }
                 
-                DispatchQueue.main.async {
-                    self?.matches = updatedMatches
-                    self?.isLoading = false
+                dispatchGroup.notify(queue: .main) {
+                    self.matches = updatedMatches
+                    self.isLoading = false
                 }
             }
+        }
+    }
+}
+
+// Extension to help with async operations
+extension DispatchQueue {
+    static func asyncOnMain(_ block: @escaping () -> Void) {
+        if Thread.isMainThread {
+            block()
+        } else {
+            DispatchQueue.main.async(execute: block)
         }
     }
 }
