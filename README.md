@@ -1,6 +1,6 @@
 # FlatMate - iOS Roommate Matching App
 
-FlatMate is a modern iOS application designed to help users find compatible roommates through a streamlined matching process.
+FlatMates is a modern iOS application designed to help users find compatible roommates through a streamlined matching process.
 
 ## Features
 
