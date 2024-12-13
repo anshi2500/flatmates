@@ -1,4 +1,4 @@
-# FlatMate - iOS Roommate Matching App
+# FlatMates - iOS Roommate Matching App
 
 FlatMates is a modern iOS application designed to help users find compatible roommates through a streamlined matching process.
 
@@ -90,4 +90,4 @@ Project Link: [https://github.com/users/Anidion/projects/1/views/1](https://gith
 
 ---
 
-Developed with ❤️ by Bradley Li and team.
+Developed with ❤️ by Anshi, Ben, Bradley, Jessie Joey, Lilia, Nayera and Youssef.
