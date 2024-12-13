@@ -20,136 +20,140 @@ struct SignupView: View {
 
     var body: some View {
         NavigationView {
-            VStack {
-                // Logo Image
-                Image("Logo Straight Blue")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 103)
-                    .padding(.top, 15)
-                    .padding(.bottom, 20)
-                    .padding(.horizontal, 35)
-                
-                // Signup Title
-                Text("Create Your Account")
-                    .font(.custom("Outfit-Bold", size: 28))
-                    .multilineTextAlignment(.center)
-                    .padding(.vertical, 20)
-                
-                // Input Fields
+            ScrollView {
                 VStack {
-                    InputView(text: $username, title: "Username", placeholder: "username", isSecureField: false)
-                    InputView(text: $email, title: "Email Address", placeholder: "name@example.com", isSecureField: false)
+                    // Logo Image
+                    Image("Logo Straight Blue")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 103)
+                        .padding(.top, 15)
+                        .padding(.bottom, 18)
+                        .padding(.horizontal, 35)
                     
-                    // Password Field with Tooltip
-                    VStack(alignment: .leading) {
-                        HStack {
-                            Text("Password")
+                    // Signup Title
+                    Text("Create Your Account")
+                        .font(.custom("Outfit-Bold", size: 28))
+                        .multilineTextAlignment(.center)
+                        .padding(.bottom, 22)
+                    
+                    // Input Fields
+                    VStack {
+                        InputView(text: $username, title: "Username", placeholder: "username", isSecureField: false)
+                        InputView(text: $email, title: "Email Address", placeholder: "name@example.com", isSecureField: false)
+                        
+                        // Password Field with Tooltip
+                        VStack(alignment: .leading) {
+                            HStack {
+                                Text("Password")
                                     .font(.system(size: 16, weight: .light))
-                            
-                            Button(action: {
-                                showPasswordRules.toggle()
-                            }) {
-                                Image(systemName: "questionmark.circle")
-                                    .foregroundColor(.gray)
-                                    .padding(.leading, 5)
-                            }
-                            .popover(isPresented: $showPasswordRules) {
-                                VStack(alignment: .leading) {
-                                    Spacer()
-                                    Text("Password Requirements")
-                                        .font(.headline)
-                                        .padding(.bottom, 5)
-
-                                    // Use a scrollable VStack if content exceeds height
-                                    ScrollView {
-                                        VStack(alignment: .leading, spacing: 8) {
-                                            Text("• Password must be at least 12 characters long.")
-                                            Text("• Password must include at least one uppercase letter.")
-                                            Text("• Password must include at least one lowercase letter.")
-                                            Text("• Password must include at least one number.")
-                                            Text("• Password must include at least one special character.")
+                                
+                                Button(action: {
+                                    showPasswordRules.toggle()
+                                }) {
+                                    Image(systemName: "questionmark.circle")
+                                        .foregroundColor(.gray)
+                                        .padding(.leading, 5)
+                                }
+                                .popover(isPresented: $showPasswordRules) {
+                                    VStack(alignment: .leading) {
+                                        Spacer()
+                                        Text("Password Requirements")
+                                            .font(.headline)
+                                            .padding(.bottom, 5)
+                                        
+                                        // Use a scrollable VStack if content exceeds height
+                                        ScrollView {
+                                            VStack(alignment: .leading, spacing: 8) {
+                                                Text("• Password must be at least 12 characters long.")
+                                                Text("• Password must include at least one uppercase letter.")
+                                                Text("• Password must include at least one lowercase letter.")
+                                                Text("• Password must include at least one number.")
+                                                Text("• Password must include at least one special character.")
+                                            }
+                                            .padding(.horizontal, 15) // Add some horizontal padding to the text
                                         }
-                                        .padding(.horizontal, 15) // Add some horizontal padding to the text
+                                        .frame(height: 250)
                                     }
-                                    .frame(height: 250)
+                                    .padding()
+                                    .presentationCompactAdaptation(.popover)
                                 }
-                                .padding()
-                                .presentationCompactAdaptation(.popover)
                             }
+                            InputView(text: $password, title: "", placeholder: "***************", isSecureField: true)
                         }
-                        InputView(text: $password, title: "", placeholder: "***************", isSecureField: true)
+                        
+                        InputView(text: $confirmPassword, title: "Confirm Password", placeholder: "***************", isSecureField: true)
+                        
+                        // Error Message Display
+                        ZStack {
+                            Text(errorMessage ?? "")
+                                .font(.custom("Outfit-Regular", size: 14))
+                                .foregroundColor(.red)
+                                .multilineTextAlignment(.leading)
+                                .opacity(errorMessage == nil ? 0 : 1)
+                        }
+                        .frame(height: 1) // fixed height for the error area
+                        
+                        // Signup Button
+                        ButtonView(title: "Sign up", action: {Task {
+                            if validatePassword() {
+                                do {
+                                    try await viewModel.createUser(withEmail: email, password: password, username: username)
+                                } catch let error as NSError {
+                                    // Handle Firebase-specific errors
+                                    if let authError = AuthErrorCode(rawValue: error.code) {
+                                        switch authError {
+                                        case .emailAlreadyInUse:
+                                            errorMessage = "The email address is already taken."
+                                        default:
+                                            errorMessage = "Failed to create an account. Please try again."
+                                        }
+                                    } else {
+                                        errorMessage = "An unexpected error occurred. Please contact support."
+                                    }
+                                }
+                            }
+                        }})
                     }
-
-                    InputView(text: $confirmPassword, title: "Confirm Password", placeholder: "***************", isSecureField: true)
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 20)
                     
-                    // Error Message Display
-                    if let errorMessage = errorMessage {
-                        Text(errorMessage)
-                            .font(.custom("Outfit-Regular", size: 14))
-                            .foregroundColor(.red)
-                            .multilineTextAlignment(.leading)
-                            .padding(.bottom, 10)
+                    // Terms of Service and Privacy Policy
+                    VStack {
+                        (
+                            Text("ⓘ By tapping 'Sign up', you agree to our ")
+                            + Text("Terms of Service").underline()
+                            + Text(" and ")
+                            + Text("Privacy Policy").underline()
+                            + Text(".")
+                        )
+                        .multilineTextAlignment(.center)
                     }
-
-                    // Signup Button
-                    ButtonView(title: "Sign up", action: {Task {
-                        if validatePassword() {
-                            do {
-                                try await viewModel.createUser(withEmail: email, password: password, username: username)
-                            } catch let error as NSError {
-                                // Handle Firebase-specific errors
-                                if let authError = AuthErrorCode(rawValue: error.code) {
-                                    switch authError {
-                                    case .emailAlreadyInUse:
-                                        errorMessage = "The email address is already taken."
-                                    default:
-                                        errorMessage = "Failed to create an account. Please try again."
-                                    }
-                                } else {
-                                    errorMessage = "An unexpected error occurred. Please contact support."
-                                }
-                            }
+                    .font(.custom("Outfit-Regular", size: 15))
+                    .foregroundColor(.primary)
+                    .padding(.horizontal, 15)
+                    .padding(.bottom, 35)
+                    
+                    // Already have an account? Log in button
+                    Button(action: {
+                        dismiss() // Dismiss the signup view to return to login
+                    }) {
+                        HStack(spacing: 3) {
+                            Text("Already have an account?")
+                                .font(.custom("Outfit-Regular", size: 17))
+                                .foregroundColor(.primary)
+                            Text("Log in")
+                                .font(.custom("Outfit-Bold", size: 17))
+                                .foregroundColor(Color("primary")) // Use your custom primary color here
+                                .underline()
                         }
-                    }})
+                    }
+                    .padding(.bottom, 20)
                 }
                 .padding(.horizontal, 20)
-                .padding(.bottom, 20)
-                
-                // Terms of Service and Privacy Policy
-                VStack {
-                    (
-                        Text("ⓘ By tapping 'Sign up', you agree to our ")
-                        + Text("Terms of Service").underline()
-                        + Text(" and ")
-                        + Text("Privacy Policy").underline()
-                        + Text(".")
-                    )
-                    .multilineTextAlignment(.center)
-                }
-                .font(.custom("Outfit-Regular", size: 15))
-                .foregroundColor(.primary)
-                .padding(.horizontal, 15)
-                Spacer()
-
-                // Already have an account? Log in button
-                Button(action: {
-                    dismiss() // Dismiss the signup view to return to login
-                }) {
-                    HStack(spacing: 3) {
-                        Text("Already have an account?")
-                            .font(.custom("Outfit-Regular", size: 17))
-                            .foregroundColor(.primary)
-                        Text("Log in")
-                            .font(.custom("Outfit-Bold", size: 17))
-                            .foregroundColor(Color("primary")) // Use your custom primary color here
-                            .underline()
-                    }
-                }
-                .padding(.bottom, 20)
             }
-            .padding(.horizontal, 20)
-            .navigationBarHidden(true) // Hide the navigation bar
+            .scrollDismissesKeyboard(.interactively)
+            .navigationBarHidden(true)
         }
     }
     
