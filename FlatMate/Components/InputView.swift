@@ -7,6 +7,10 @@
 
 import SwiftUI
 
+enum FieldToFocus {
+    case textField, secureField
+}
+
 struct InputFieldStyle: ViewModifier {
     func body(content: Content) -> some View {
         content
@@ -23,23 +27,27 @@ struct InputView: View {
     let title: String
     let placeholder: String
     var isSecureField: Bool
-    
+    @FocusState var focusedField: FieldToFocus?
+
     var body: some View {
         VStack(alignment: .leading) {
             Text(title)
                 .font(.custom("Outfit-ExtraLight", size: 17))
                 .padding(.bottom, -5)
-            
+
             // Ternary operator to decide between SecureField and TextField
-            (isSecureField ? AnyView(SecureField(placeholder, text: $text)
-                                    .autocapitalization(.none)
-                                    .modifier(InputFieldStyle()))
-                            : AnyView(TextField(placeholder, text: $text)
-                                    .autocapitalization(.none)
-                                    .modifier(InputFieldStyle())))
+            Group {
+                if isSecureField {
+                    SecureField(placeholder, text: $text).focused($focusedField, equals: .secureField)
+                } else {
+                    TextField(placeholder, text: $text).focused($focusedField, equals: .textField)
+                }
+            }
+            .autocapitalization(.none)
+            .modifier(InputFieldStyle())
         }
         .frame(maxWidth: .infinity, minHeight: 48) // Adjusted frame
-//        .padding(.bottom, 20)
+        .onChange(of: focusedField) { focusedField = isSecureField ? .textField : .secureField }
     }
 }
 
