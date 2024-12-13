@@ -111,8 +111,9 @@ struct LoginView: View {
                     .font(.custom("Outfit-Regular", size: 15))
                     .foregroundColor(.primary)
                     .padding(.horizontal, 15)
+                    .padding(.bottom, 45)
                     
-                    Spacer()
+                    
                     
                     // Sign Up Section
                     HStack {

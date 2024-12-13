@@ -92,7 +92,7 @@ struct SignupView: View {
                     .font(.custom("Outfit-Regular", size: 15))
                     .foregroundColor(.primary)
                     .padding(.horizontal, 15)
-                    Spacer()
+                    .padding(.bottom, 45)
                     
                     // Already have an account? Log in button
                     Button(action: {
