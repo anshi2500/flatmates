@@ -33,8 +33,8 @@ struct SwipePageView: View {
                 )
             } else if viewModel.profiles.isEmpty {
                 Text("No profiles available.")
-                    .font(.custom("Outfit-Bold", size: 20))
-                    .foregroundStyle(Color("primary"))
+                    .font(.custom("Outfit-Regular", size: 20))
+                    .foregroundColor(.gray)
             } else {
                 let swipeModel = SwipeCardsView.Model(cards: viewModel.profiles)
                 SwipeCardsView(model: swipeModel) { model in

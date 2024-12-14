@@ -21,6 +21,7 @@ struct MessagesView: View {
                 .font(.custom("Outfit-Bold", size: 38))
                 .foregroundColor(Color("primary"))
                 .padding(.horizontal)
+                .frame(maxWidth: .infinity, alignment: .leading)
 
             if viewModel.isLoading {
                 // Loading Indicator
@@ -30,9 +31,10 @@ struct MessagesView: View {
                 if viewModel.matches.isEmpty {
                     // Empty State
                     Text("No matches found.")
-                        .font(.subheadline)
+                        .font(.custom("Outfit-Regular", size: 20))
                         .foregroundColor(.gray)
-                        .padding(.horizontal)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .frame(maxHeight: .infinity, alignment: .center)
                 } else {
                     // List of Matches
                     ScrollView {
