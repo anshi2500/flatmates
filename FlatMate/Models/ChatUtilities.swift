@@ -9,44 +9,32 @@ import FirebaseFirestore
 import Foundation
 
 struct ChatUtilities {
-    static func getOrCreateChatID(
-        user1: String,
-        user2: String,
-        completion: @escaping (Result<String, Error>) -> Void
-    ) {
+    static func fetchChatID(user1: String, user2: String, completion: @escaping (String?) -> Void) {
         let db = Firestore.firestore()
         let chatCollection = db.collection("chats")
         
-        // Query to check if a chat already exists for the given users
-        chatCollection
-            .whereField("users", arrayContains: user1)
-            .getDocuments { snapshot, error in
-                if let error = error {
-                    completion(.failure(error))
-                    return
-                }
-                
-                // Look for a matching document
-                if let documents = snapshot?.documents {
-                    for document in documents {
-                        let data = document.data()
-                        if let participants = data["users"] as? [String], participants.contains(user2) {
-                            completion(.success(document.documentID)) // Found existing chatID
-                            return
-                        }
-                    }
-                }
-                
-                // No chat found, create a new one
+        // Query to check if chatID exists
+        let chatID = [user1, user2].sorted().joined(separator: "_")
+        let chatDocRef = chatCollection.document(chatID)
+        
+        chatDocRef.getDocument { document, error in
+            if let error = error {
+                print("Error checking chatID existence: \(error)")
+                completion(nil)
+                return
+            }
+            
+            if let document = document, document.exists {
+                print("Found existing chatID: \(chatID)")
+                completion(chatID)
+            } else {
+                print("ChatID does not exist. Creating a new one.")
                 createChatID(user1: user1, user2: user2, completion: completion)
             }
+        }
     }
     
-    private static func createChatID(
-        user1: String,
-        user2: String,
-        completion: @escaping (Result<String, Error>) -> Void
-    ) {
+    private static func createChatID(user1: String, user2: String, completion: @escaping (String?) -> Void) {
         let db = Firestore.firestore()
         let chatCollection = db.collection("chats")
         
@@ -55,13 +43,16 @@ struct ChatUtilities {
             "createdAt": FieldValue.serverTimestamp()
         ]
         
-        chatCollection.addDocument(data: chatData) { error in
+        let chatID = [user1, user2].sorted().joined(separator: "_")
+        let chatRef = chatCollection.document(chatID)
+        chatRef.setData(chatData) { error in
             if let error = error {
-                completion(.failure(error))
+                print("Error creating chatID: \(error)")
+                completion(nil)
             } else {
-                let documentID = chatCollection.document().documentID
-                completion(.success(documentID)) // Return the new chatID
+                completion(chatID)
             }
         }
+        print("Created new chatID: \(chatID)")
     }
 }

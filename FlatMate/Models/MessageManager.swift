@@ -68,42 +68,5 @@ class MessageManager: ObservableObject {
                 completion(.success(messages))
             }
         }
-    }
-    
-    func getOrCreateChatID(user1: String, user2: String, completion: @escaping (Result<String, Error>) -> Void) {
-        let userIDs = [user1, user2].sorted()
-        let query = db.collection("chats").whereField("users", isEqualTo: userIDs)
-        
-        query.getDocuments { snapshot, error in
-            if let error = error {
-                completion(.failure(error))
-            } else if let documents = snapshot?.documents, !documents.isEmpty {
-                if let document = documents.first {
-                    completion(.success(document.documentID))
-                }
-            } else {
-                let chatData: [String: Any] = [
-                    "users": userIDs,
-                    "createdAt": FieldValue.serverTimestamp()
-                ]
-                
-                let newChatRef = db.collection("chats").document()
-                
-                newChatRef.setData(chatData) { error in
-                    if let error = error {
-                        completion(.failure(error))
-                    } else {
-                        newChatRef.getDocument { _, docError in
-                            if let docError = docError {
-                                completion(.failure(docError))
-                            } else {
-                                completion(.success(newChatRef.documentID))
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
+    }    
 }
