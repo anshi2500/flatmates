@@ -58,24 +58,23 @@ struct Match: Identifiable {
                     if let userData = userSnapshot?.data(),
                        let name = userData["firstName"] as? String
                     {
+                        dispatchGroup.enter()
                         // Fetch or create chatID
                         ChatUtilities.fetchChatID(user1: currentUserID, user2: otherUserID, completion: { chatID in
+                            defer { dispatchGroup.leave() }
                             let imageURL = userData["profileImageURL"] as? String
                             let match = Match(
-                                id: matchID,
+                                id: otherUserID,
                                 name: name,
                                 imageURL: imageURL ?? "",
                                 chatID: chatID
                             )
-                            
                             matches.append(match)
-                            dispatchGroup.leave()
                         })
                     }
                 }
             }
         }
-
         dispatchGroup.notify(queue: .main) {
             completion(matches)
         }
