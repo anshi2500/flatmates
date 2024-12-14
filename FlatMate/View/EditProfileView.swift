@@ -159,6 +159,7 @@ struct EditProfileView: View {
                             .padding(.vertical, -10)
                     }
                     .offset(y: -7)
+                    .padding(.bottom, 30)
                 }
                 .padding(.horizontal, 25)
                 .onAppear { fetchUserData() } // Load data when the view appears
