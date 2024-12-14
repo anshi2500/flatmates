@@ -22,7 +22,7 @@ struct MatchRow: View {
                             .scaledToFill()
                             .frame(width: 90, height: 90)
                             .clipShape(Circle())
-                    } else if phase.error != nil {
+                    } else if phase.error != nil || imageURL == "" {
                         // Display a placeholder if there's an error
                         Image(systemName: "person.fill")
                             .resizable()

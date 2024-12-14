@@ -14,7 +14,6 @@ let frequencies = ["Never", "Sometimes", "Always"]
 
 struct EditProfileView: View {
     @EnvironmentObject var viewModel: AuthViewModel
-    @Environment(\.presentationMode) var presentationMode // Add this environment property
     
     // Profile fields
     @State private var firstName: String = ""
@@ -32,6 +31,7 @@ struct EditProfileView: View {
     @State private var isImagePickerPresented = false
     @State private var errorMessage: String?
     @State private var selectedItem: PhotosPickerItem? = nil
+    @State private var updateSuccess: Bool = false
     
     var body: some View {
         NavigationView {
@@ -159,10 +159,21 @@ struct EditProfileView: View {
                             .padding(.vertical, -10)
                     }
                     .offset(y: -7)
+                    .padding(.bottom, 30)
                 }
                 .padding(.horizontal, 25)
                 .onAppear { fetchUserData() } // Load data when the view appears
             }
+        }
+        .alert(
+            "Success",
+            isPresented: $updateSuccess
+        ) {
+            Button("Ok") {
+                updateSuccess = false
+            }
+        } message: {
+            Text("Profile Updated Successfully")
         }
     }
     
@@ -238,7 +249,7 @@ struct EditProfileView: View {
                     profileImage: profileImage
                 )
                 errorMessage = nil
-                presentationMode.wrappedValue.dismiss() // Dismiss view after successful update
+                updateSuccess = true
             } catch {
                 errorMessage = "Failed to update profile: \(error.localizedDescription)"
             }

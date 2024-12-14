@@ -31,8 +31,6 @@ func renderProfileImageFromUrl(_ profileUrl: String?) -> some View {
     }
 }
 
-// Helper function to calculate age from date of birth
-// Copied from EditProfileView, we should probably make a utilities file
 private func calculateAge(from dob: Date) -> Int {
     let calendar = Calendar.current
     let now = Date()
@@ -42,12 +40,10 @@ private func calculateAge(from dob: Date) -> Int {
 
 struct YouMatchedView: View {
     @EnvironmentObject var authViewModel: AuthViewModel
-
     @Binding var isOpen: Bool
+    @Binding var navigateToMessagesView: Bool
     var thisUser: User
     var otherUser: ProfileCardView.Model
-
-    @State private var navigateToMessagesView = false
 
     var body: some View {
         NavigationStack {
@@ -56,7 +52,9 @@ struct YouMatchedView: View {
                     .font(.custom("Outfit-Bold", size: 48))
                     .foregroundStyle(Color("primary"))
                     .padding()
+                
                 Spacer()
+                
                 HStack {
                     VStack {
                         renderProfileImageFromUrl(otherUser.profileImageURL)
@@ -64,6 +62,7 @@ struct YouMatchedView: View {
                             .font(.custom("Outfit-Bold", size: 24))
                     }
                     .padding()
+                    
                     VStack {
                         renderProfileImageFromUrl(thisUser.profileImageURL)
                         Text("\(thisUser.firstName ?? "You"), \(calculateAge(from: thisUser.dob!))")
@@ -71,7 +70,9 @@ struct YouMatchedView: View {
                     }
                     .padding()
                 }
+                
                 Spacer()
+                
                 HStack(spacing: 30) {
                     ButtonView(
                         title: "Keep Swiping",
@@ -80,19 +81,57 @@ struct YouMatchedView: View {
                         },
                         type: .outline
                     )
+                    
                     ButtonView(
                         title: "Go to Matches",
                         action: {
                             navigateToMessagesView = true
+                            isOpen = false
                         }
                     )
                 }
-            }
-            .padding()
-            .navigationDestination(isPresented: $navigateToMessagesView) {
-                MessagesView()
+                .padding(.horizontal)
+                .padding(.bottom, 40)
             }
         }
     }
+}
 
+// Preview provider for development
+struct YouMatchedView_Previews: PreviewProvider {
+    static var previews: some View {
+        let sampleUser = User(
+            id: "1",
+            email: "test@example.com",
+            username: "testuser",
+            firstName: "John",
+            lastName: "Doe",
+            dob: Date(),
+            hasCompletedOnboarding: true
+        )
+        
+        let sampleOtherUser = ProfileCardView.Model(
+            id: "2",
+            firstName: "Jane",
+            age: 25,
+            gender: "Female",
+            bio: "Hello!",
+            roomState: "Looking",
+            location: "Toronto",
+            profileImageURL: nil,
+            isSmoker: false,
+            petsOk: true,
+            noiseTolerance: 3.0,
+            partyFrequency: "Sometimes",
+            guestFrequency: "Sometimes"
+        )
+        
+        YouMatchedView(
+            isOpen: .constant(true),
+            navigateToMessagesView: .constant(false),
+            thisUser: sampleUser,
+            otherUser: sampleOtherUser
+        )
+        .environmentObject(AuthViewModel())
+    }
 }
