@@ -31,6 +31,7 @@ struct EditProfileView: View {
     @State private var isImagePickerPresented = false
     @State private var errorMessage: String?
     @State private var selectedItem: PhotosPickerItem? = nil
+    @State private var updateSuccess: Bool = false
     
     var body: some View {
         NavigationView {
@@ -164,6 +165,16 @@ struct EditProfileView: View {
                 .onAppear { fetchUserData() } // Load data when the view appears
             }
         }
+        .alert(
+            "Success",
+            isPresented: $updateSuccess
+        ) {
+            Button("Ok") {
+                updateSuccess = false
+            }
+        } message: {
+            Text("Profile Updated Successfully")
+        }
     }
     
     // Fetch user data from Firebase
@@ -238,6 +249,7 @@ struct EditProfileView: View {
                     profileImage: profileImage
                 )
                 errorMessage = nil
+                updateSuccess = true
             } catch {
                 errorMessage = "Failed to update profile: \(error.localizedDescription)"
             }
