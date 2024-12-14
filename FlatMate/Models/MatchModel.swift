@@ -58,9 +58,19 @@ struct Match: Identifiable {
                     if let userData = userSnapshot?.data(),
                        let name = userData["firstName"] as? String
                     {
-                        let imageURL = userData["profileImageURL"] as? String
-                        let match = Match(id: otherUserID, name: name, imageURL: imageURL ?? "")
-                        matches.append(match)
+                        // Fetch or create chatID
+                        ChatUtilities.fetchChatID(user1: currentUserID, user2: otherUserID, completion: { chatID in
+                            let imageURL = userData["profileImageURL"] as? String
+                            let match = Match(
+                                id: matchID,
+                                name: name,
+                                imageURL: imageURL ?? "",
+                                chatID: chatID
+                            )
+                            
+                            matches.append(match)
+                            dispatchGroup.leave()
+                        })
                     }
                 }
             }

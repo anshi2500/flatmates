@@ -38,18 +38,13 @@ class MessagesViewModel: ObservableObject {
                 for (index, match) in fetchedMatches.enumerated() {
                     dispatchGroup.enter()
                     
-                    ChatUtilities.getOrCreateChatID(user1: currentUserID, user2: match.id) { result in
-                        switch result {
-                        case .success(let chatID):
-                            updatedMatches[index] = Match(
-                                id: match.id,
-                                name: match.name,
-                                imageURL: match.imageURL,
-                                chatID: chatID
-                            )
-                        case .failure(let error):
-                            print("Error getting/creating chatID: \(error.localizedDescription)")
-                        }
+                    ChatUtilities.fetchChatID(user1: currentUserID, user2: match.id) { chatID in
+                        updatedMatches[index] = Match(
+                            id: match.id,
+                            name: match.name,
+                            imageURL: match.imageURL,
+                            chatID: chatID
+                        )
                         dispatchGroup.leave()
                     }
                 }
