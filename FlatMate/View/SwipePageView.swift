@@ -24,8 +24,6 @@ struct SwipePageView: View {
         VStack {
             if viewModel.isLoading {
                 ProgressView("Loading Profiles...")
-            } else if viewModel.profiles.isEmpty {
-                Text("No profiles available.")
             } else if matchConfirmed && lastMatch != nil {
                 YouMatchedView(
                     isOpen: $matchConfirmed,
@@ -33,6 +31,10 @@ struct SwipePageView: View {
                     thisUser: thisUser!,
                     otherUser: lastMatch!
                 )
+            } else if viewModel.profiles.isEmpty {
+                Text("No profiles available.")
+                    .font(.custom("Outfit-Bold", size: 20))
+                    .foregroundStyle(Color("primary"))
             } else {
                 let swipeModel = SwipeCardsView.Model(cards: viewModel.profiles)
                 SwipeCardsView(model: swipeModel) { model in
