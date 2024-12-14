@@ -47,29 +47,53 @@ FlatMates is a modern iOS application designed to help users find compatible roo
 - Xcode 16.0 or later
 - Firebase account for backend services
 
-## Installation
+## Test Instructions for Submission
 
-1. Clone the repository
-```bash
-git clone https://github.com/anidion/FlatMates.git
-```
+### Create the first account:
 
-2. Install dependencies
-```bash
-cd FlatMate
-```
+- Sign up for a new account
+- Fill out all profile and preference information completely
+- Log out of the first account
 
-3. Open the project in Xcode
-```bash
-open FlatMate.xcodeproj
-```
 
-4. Configure Firebase
-   - Add your `GoogleService-Info.plist` to the project
-   - Enable necessary Firebase services in Firebase Console
+### Create the second account:
 
-5. Build and run the project in Xcode
+- Sign up for another account
+- Fill out all profile and preference information entirely
+- Swipe right on the first account to express interest
+- Log out of the second account
 
+
+### Match the accounts:
+
+- Log into the first account
+- Swipe right on the second account to create a match
+- Expect to see a match page displaying the connection between the accounts
+
+
+### Initiate a conversation:
+
+- On the match page, tap "Go to Match"
+- The app should navigate to the chatting page with the second user account
+
+
+### Test sending messages (First account):
+
+- Type and send several messages to the second user account
+- Log out of the first account
+
+
+### Verify message reception (Second account):
+
+- Log into the second user account
+- Check if the messages sent from the first account have been received
+- Log out of the second account
+
+
+### Confirm message sync (First account):
+
+- Log back into the first user account
+- Verify that the messages sent from the second user are visible and synced correctly
 ## License
 
 This project is licensed under the GNU Affero General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
