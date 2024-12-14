@@ -30,7 +30,7 @@ struct TitleRow: View {
                             .aspectRatio(contentMode: .fill)
                             .frame(width: 50, height: 50)
                             .cornerRadius(50)
-                    } else if phase.error != nil {
+                    } else if phase.error != nil || imageURL == "" {
                         // Placeholder for error loading
                         Image(systemName: "person.fill")
                             .resizable()
