@@ -25,9 +25,14 @@ struct MessagesView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                 if viewModel.isLoading {
-                // Loading Indicator
+                    // Loading Indicator, centered on screen
+                    VStack {
+                        Spacer()
                         ProgressView("Loading matches...")
                             .padding()
+                            .frame(maxWidth: .infinity, alignment: .center)
+                        Spacer()
+                    }
                 } else {
                     if viewModel.matches.isEmpty {
                         // Empty State
