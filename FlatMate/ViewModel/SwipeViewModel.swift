@@ -42,19 +42,31 @@ class SwipeViewModel: ObservableObject {
         }
     }
     
+    func resetSwipedProfiles(forUser userID: String) async {
+        let db = Firestore.firestore()
+        do {
+            try await db.collection("users")
+                .document(userID)
+                .updateData(["swipedProfiles": FieldValue.delete()])
+            
+        } catch {
+            print("Error resetting swiped profiles: \(error.localizedDescription)")
+        }
+    }
+    
     func fetchProfiles(currentUserID: String) async {
         let db = Firestore.firestore()
         await MainActor.run { self.isLoading = true }
         
         do {
-            // 1. Fetch the current user doc to grab its 'city' and swiped profiles
+            //  Fetch the current user doc to grab its 'city' and swiped profiles
             let userDoc = try await db.collection("users").document(currentUserID).getDocument()
             let swipedProfiles = userDoc.data()?["swipedProfiles"] as? [String] ?? []
             
-            // 2. Also figure out the city of this user (default to empty if missing)
+            //  Also figure out the city of this user (default to empty if missing)
             let currentUserCity = userDoc.data()?["city"] as? String ?? ""
             
-            // 3. Also fetch existing matches so we can exclude them
+            //  Also fetch existing matches so we can exclude them
             let matchesSnapshot = try await db.collection("matches").getDocuments()
             let matchedProfiles = matchesSnapshot.documents.compactMap { doc -> String? in
                 let data = doc.data()
@@ -69,16 +81,16 @@ class SwipeViewModel: ObservableObject {
                 return nil
             }
             
-            // 4. Combine both sets of profiles to exclude
+            // Combine both sets of profiles to exclude
             let excludedProfiles = Set(swipedProfiles + matchedProfiles)
             
-            // 5. Fetch other profiles *only* from the same city
+            //  Fetch other profiles *only* from the same city
             let snapshot = try await db.collection("users")
                 .whereField("city", isEqualTo: currentUserCity)
                 .whereField("id", isNotEqualTo: currentUserID)
                 .getDocuments()
             
-            // 6. Decode and filter out excluded profiles
+            // Decode and filter out excluded profiles
             let profiles = snapshot.documents.compactMap { doc -> ProfileCardView.Model? in
                 do {
                     let profile = try doc.data(as: ProfileCardView.Model.self)

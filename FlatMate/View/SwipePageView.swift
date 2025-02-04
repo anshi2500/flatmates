@@ -32,9 +32,21 @@ struct SwipePageView: View {
                     otherUser: lastMatch!
                 )
             } else if viewModel.profiles.isEmpty {
-                Text("No profiles available.")
-                    .font(.custom("Outfit-Regular", size: 20))
-                    .foregroundColor(.gray)
+                VStack(spacing: 16) {
+               
+                
+                    Button(action: {
+                        Task {
+                            await viewModel.resetSwipedProfiles(forUser: userID)
+                            await viewModel.fetchProfiles(currentUserID: userID)
+                        }
+                    }) {
+                        Text("Start Over")
+                            .font(.custom("Outfit-Regular", size: 30))
+                            .foregroundColor(.gray)
+                    }
+
+                    }
             } else {
                 let swipeModel = SwipeCardsView.Model(cards: viewModel.profiles)
                 SwipeCardsView(model: swipeModel) { model in
