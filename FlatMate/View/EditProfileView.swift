@@ -173,7 +173,7 @@ struct EditProfileView: View {
                 updateSuccess = false
             }
         } message: {
-            Text("Profile Updated Successfully")
+            Text("Changes Updated Successfully")
         }
     }
     
