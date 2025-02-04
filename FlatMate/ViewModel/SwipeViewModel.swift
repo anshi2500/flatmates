@@ -47,11 +47,14 @@ class SwipeViewModel: ObservableObject {
         await MainActor.run { self.isLoading = true }
         
         do {
-            // Step 1: Fetch the user's swiped profiles
+            // 1. Fetch the current user doc to grab its 'city' and swiped profiles
             let userDoc = try await db.collection("users").document(currentUserID).getDocument()
             let swipedProfiles = userDoc.data()?["swipedProfiles"] as? [String] ?? []
             
-            // Step 2: Also fetch existing matches to exclude them
+            // 2. Also figure out the city of this user (default to empty if missing)
+            let currentUserCity = userDoc.data()?["city"] as? String ?? ""
+            
+            // 3. Also fetch existing matches so we can exclude them
             let matchesSnapshot = try await db.collection("matches").getDocuments()
             let matchedProfiles = matchesSnapshot.documents.compactMap { doc -> String? in
                 let data = doc.data()
@@ -66,18 +69,20 @@ class SwipeViewModel: ObservableObject {
                 return nil
             }
             
-            // Step 3: Combine both sets of profiles to exclude
+            // 4. Combine both sets of profiles to exclude
             let excludedProfiles = Set(swipedProfiles + matchedProfiles)
             
-            // Step 4: Fetch and filter available profiles
+            // 5. Fetch other profiles *only* from the same city
             let snapshot = try await db.collection("users")
+                .whereField("city", isEqualTo: currentUserCity)
                 .whereField("id", isNotEqualTo: currentUserID)
                 .getDocuments()
             
+            // 6. Decode and filter out excluded profiles
             let profiles = snapshot.documents.compactMap { doc -> ProfileCardView.Model? in
                 do {
                     let profile = try doc.data(as: ProfileCardView.Model.self)
-                    // Only include profiles that haven't been swiped or matched
+                    // Exclude swiped or matched profiles
                     return excludedProfiles.contains(profile.id) ? nil : profile
                 } catch {
                     print("Error decoding profile: \(error.localizedDescription)")
@@ -94,4 +99,5 @@ class SwipeViewModel: ObservableObject {
             await MainActor.run { self.isLoading = false }
         }
     }
+
 }
