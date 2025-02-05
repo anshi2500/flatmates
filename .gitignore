@@ -61,4 +61,5 @@ fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
 
+FlatMate/Secrets.plist
 .DS_Store
