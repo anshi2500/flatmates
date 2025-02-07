@@ -114,9 +114,12 @@ struct ProfileCardView: View {
                 VStack(alignment: .leading) {
                     Text("\(profile.firstName), \(profile.age)")
                         .font(.custom("Outfit-Bold", size: 32))
-                        .colorInvert()
-                    Text(profile.gender).colorInvert()
-                    Text("\(profile.roomState) in \(profile.location)").colorInvert()
+                        .fontWeight(.bold)
+                        .lineLimit(1)
+                        .foregroundColor(.black)
+                    
+                    Text(profile.gender).foregroundColor(.black)
+                    Text("\(profile.roomState) in \(profile.location)").foregroundColor(.black)
                 }
                 .padding()
                 .background(.ultraThinMaterial)
