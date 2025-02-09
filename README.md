@@ -2,6 +2,12 @@
 
 FlatMates is a modern iOS application designed to help users find compatible roommates through a streamlined matching process.
 
+## Architecture Diagram
+<img width="1053" alt="Screenshot 2025-02-08 at 5 56 24 PM" src="https://github.com/user-attachments/assets/bce6cabc-fad6-4b76-ae08-832a6dcdd471" />
+
+## [UI Design Files](https://uofc-my.sharepoint.com/:p:/g/personal/lilia_skumatova_ucalgary_ca/EUHMQlcYqvlNvSYzA0gcFBYBsWNq71Cm9gOUJicBBzhsPg?e=R5BOqs)
+<img width="1010" alt="Screenshot 2025-02-08 at 5 54 17 PM" src="https://github.com/user-attachments/assets/ba3f6301-e38a-4df5-882e-67d311aa6cd4" />
+
 ## Features
 
 ### Smart Matching System
