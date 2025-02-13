@@ -149,7 +149,7 @@ class AuthViewModel: ObservableObject {
     func updateProfile(
         firstname: String,
         lastname: String,
-        dob: Date, // Updated to accept Date instead of age
+        dob: Date,
         age: Int,
         bio: String,
         isSmoker: Bool,
@@ -160,13 +160,17 @@ class AuthViewModel: ObservableObject {
         noiseTolerance: Double,
         profileImage: UIImage?
     ) async throws {
-        guard let uid = userSession?.uid else { throw NSError(domain: "AuthError", code: 401, userInfo: [NSLocalizedDescriptionKey: "User not logged in"]) }
+        guard let uid = userSession?.uid else {
+            print("DEBUG: No logged in user. Cannot update profile.")
+            throw NSError(domain: "AuthError", code: 401, userInfo: [NSLocalizedDescriptionKey: "User not logged in"])
+        }
 
-        // Prepare updated data
+        print("DEBUG: Updating profile for uid: \(uid)")
+
         var updatedData: [String: Any] = [
             "firstName": firstname,
             "lastName": lastname,
-            "dob": Timestamp(date: dob), // Store Date as Firestore Timestamp
+            "dob": Timestamp(date: dob),
             "age": age,
             "bio": bio,
             "isSmoker": isSmoker,
@@ -178,22 +182,30 @@ class AuthViewModel: ObservableObject {
         ]
 
         do {
-            // Upload profile image if available
+            // Upload the profileImage
             if let profileImage = profileImage, let imageData = profileImage.jpegData(compressionQuality: 0.8) {
+                print("DEBUG: Uploading image to Storage for user \(uid)")
                 let storageRef = Storage.storage().reference().child("profile_images/\(uid).jpg")
-                let _ = try await storageRef.putDataAsync(imageData)
+                
+                _ = try await storageRef.putDataAsync(imageData)
                 let downloadURL = try await storageRef.downloadURL()
+                print("DEBUG: Got download URL:", downloadURL.absoluteString)
                 updatedData["profileImageURL"] = downloadURL.absoluteString
+            } else {
+                print("DEBUG: No profileImage passed in, skipping image upload.")
             }
 
-            // Update Firestore document
-            try await Firestore.firestore().collection("users").document(uid).updateData(updatedData)
+            // Update Firestore user doc
+            print("DEBUG: Updating Firestore doc with:", updatedData)
+            let userRef = Firestore.firestore().collection("users").document(uid)
+            try await userRef.updateData(updatedData)
+            print("DEBUG: Successfully updated Firestore doc for \(uid)!")
 
-            // Update local `currentUser` with the new data
+            // Update local in-memory user
             if var currentUser = self.currentUser {
                 currentUser.firstName = firstname
                 currentUser.lastName = lastname
-                currentUser.dob = dob // Update dob directly
+                currentUser.dob = dob
                 currentUser.bio = bio
                 currentUser.isSmoker = isSmoker
                 currentUser.pets = pets
@@ -201,13 +213,15 @@ class AuthViewModel: ObservableObject {
                 currentUser.partyFrequency = partyFrequency
                 currentUser.guestFrequency = guestFrequency
                 currentUser.noiseTolerance = noiseTolerance
-                if let profileImageURL = updatedData["profileImageURL"] as? String {
-                    currentUser.profileImageURL = profileImageURL
+                if let url = updatedData["profileImageURL"] as? String {
+                    currentUser.profileImageURL = url
                 }
                 self.currentUser = currentUser
             }
         } catch {
+            print("DEBUG: Error updating profile: \(error.localizedDescription)")
             throw error
         }
     }
+
 }

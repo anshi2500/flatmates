@@ -28,10 +28,11 @@ struct EditProfileView: View {
     @State private var selectedGuestFrequency: String = frequencies[0]
     @State private var noiseTolerance: Double = 0.0
     @State private var profileImage: UIImage? = nil
-    @State private var isImagePickerPresented = false
+//    @State private var isImagePickerPresented = false
     @State private var errorMessage: String?
-    @State private var selectedItem: PhotosPickerItem? = nil
+//    @State private var selectedItem: PhotosPickerItem? = nil
     @State private var updateSuccess: Bool = false
+    @State private var showPixabaySheet = false
     
     var body: some View {
         NavigationView {
@@ -56,11 +57,11 @@ struct EditProfileView: View {
                                         .fill(Color.gray)
                                         .frame(width: 100, height: 100)
                                 }
-                                PhotosPicker(
-                                    selection: $selectedItem,
-                                    matching: .images,
-                                    photoLibrary: .shared()
-                                ) {
+                                
+                                Button {
+                                    // Show your pixabay sheet
+                                    showPixabaySheet = true
+                                } label: {
                                     Image(systemName: "plus")
                                         .font(.system(size: 15, weight: .bold))
                                         .foregroundColor(.white)
@@ -68,18 +69,9 @@ struct EditProfileView: View {
                                         .background(Circle().fill(Color("primary")))
                                         .shadow(radius: 5)
                                 }
-                                .onChange(of: selectedItem) { oldValue, newValue in
-                                    Task {
-                                        if let data = try? await newValue?.loadTransferable(type: Data.self),
-                                           let uiImage = UIImage(data: data) {
-                                            DispatchQueue.main.async {
-                                                profileImage = uiImage
-                                            }
-                                        }
-                                    }
-                                }
                                 .offset(x: 35, y: 35)
                             }
+
                         }
                         .padding(.trailing, 10)
                         // First Name, Last Name, Date of Birth
@@ -87,8 +79,8 @@ struct EditProfileView: View {
                             ProfileField(title: "First Name", text: $firstName)
                             ProfileField(title: "Last Name", text: $lastName)
                             DatePicker("Date of Birth", selection: $dob, displayedComponents: .date)
-                                .onChange(of: dob) {
-                                    age = calculateAge(from: dob)
+                                .onChange(of: dob) { newDate in
+                                    age = calculateAge(from: newDate)
                                 }
                         }
                     }
@@ -173,7 +165,24 @@ struct EditProfileView: View {
                 updateSuccess = false
             }
         } message: {
-            Text("Profile Updated Successfully")
+            Text("Changes Updated Successfully")
+        }.sheet(isPresented: $showPixabaySheet) {
+            PixabaySearchView { selectedImage in
+                // The user tapped a PixabayImage. We can load its largeImageURL or webformatURL.
+                if let urlStr = selectedImage.largeImageURL ?? selectedImage.webformatURL,
+                   let url = URL(string: urlStr) {
+                    Task {
+                        do {
+                            let (data, _) = try await URLSession.shared.data(from: url)
+                            if let downloadedImg = UIImage(data: data) {
+                                self.profileImage = downloadedImg
+                            }
+                        } catch {
+                            print("Error downloading chosen Pixabay image: \(error.localizedDescription)")
+                        }
+                    }
+                }
+            }
         }
     }
     
