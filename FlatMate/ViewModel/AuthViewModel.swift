@@ -135,10 +135,15 @@ class AuthViewModel: ObservableObject {
         }
     }
     
+    @MainActor
     func completeOnboarding() async throws {
         guard let uid = userSession?.uid else { return }
         do {
-            try await Firestore.firestore().collection("users").document(uid).updateData(["hasCompletedOnboarding": true])
+    try await Firestore.firestore()
+                .collection("users")
+                .document(uid)
+                .updateData(["hasCompletedOnboarding": true] as [String: Bool])
+            
             self.hasCompletedOnboarding = true
         } catch {
             print("DEBUG: Failed to update onboarding status with error \(error.localizedDescription)")
