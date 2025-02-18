@@ -15,6 +15,8 @@ struct SignupView: View {
     @State private var confirmPassword = ""
     @State private var errorMessage: String?
     @State private var showPasswordRules = false
+    @State private var isPasswordVisible = false
+    @State private var isConfirmPasswordVisible = false
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var viewModel: AuthViewModel
 
@@ -79,10 +81,66 @@ struct SignupView: View {
                                     .presentationCompactAdaptation(.popover)
                                 }
                             }
-                            InputView(text: $password, title: "", placeholder: "***************", isSecureField: true)
+                            
+                            // Password input with visibility toggle on right side
+                            ZStack {
+                                if isPasswordVisible {
+                                    TextField("Password", text: $password)
+                                        .padding(10)
+                                        .background(Color.gray.opacity(0.1))
+                                        .cornerRadius(5)
+                                } else {
+                                    SecureField("***************", text: $password)
+                                        .padding(10)
+                                        .background(Color.gray.opacity(0.1))
+                                        .cornerRadius(5)
+                                }
+                                
+                                HStack {
+                                    Spacer()
+                                    Button(action: {
+                                        isPasswordVisible.toggle()
+                                    }) {
+                                        Image(systemName: isPasswordVisible ? "eye.slash" : "eye")
+                                            .foregroundColor(.gray)
+                                    }
+                                    .padding(.trailing, 10)
+                                }
+                            }
                         }
                         
-                        InputView(text: $confirmPassword, title: "Confirm Password", placeholder: "***************", isSecureField: true)
+                        // Confirm Password input with visibility toggle on right side
+                        VStack (alignment: .leading) {
+                            HStack {
+                                Text("Confirm Password")
+                                    .font(.system(size: 16, weight: .light))
+                            }
+                            
+                            ZStack {
+                                if isConfirmPasswordVisible {
+                                    TextField("Confirm Password", text: $confirmPassword)
+                                        .padding(10)
+                                        .background(Color.gray.opacity(0.1))
+                                        .cornerRadius(5)
+                                } else {
+                                    SecureField("***************", text: $confirmPassword)
+                                        .padding(10)
+                                        .background(Color.gray.opacity(0.1))
+                                        .cornerRadius(5)
+                                }
+                                
+                                HStack {
+                                    Spacer()
+                                    Button(action: {
+                                        isConfirmPasswordVisible.toggle()
+                                    }) {
+                                        Image(systemName: isConfirmPasswordVisible ? "eye.slash" : "eye")
+                                            .foregroundColor(.gray)
+                                    }
+                                    .padding(.trailing, 10)
+                                }
+                            }
+                        }
                         
                         // Error Message Display
                         ZStack {
@@ -117,7 +175,6 @@ struct SignupView: View {
                     }
                     .padding(.horizontal, 20)
                     .padding(.bottom, 20)
-                    
                     // Terms of Service and Privacy Policy
                     VStack {
                         (

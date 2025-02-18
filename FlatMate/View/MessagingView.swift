@@ -34,10 +34,42 @@ struct MessagingView: View {
                 ScrollView {
                     VStack(spacing: 10) {
                         ForEach(viewModel.messages, id: \.id) { message in
-                            MessageBubble(message: message, received: currentUserID != message.senderID)
+                            HStack {
+                                MessageBubble(message: message, received: currentUserID != message.senderID)
+
+                                // Add a delete button for the current user's messages
+                                if message.senderID == currentUserID {
+                                    Button(action: {
+                                        viewModel.deleteMessage(chatID: chatID, messageID: message.id, senderID: message.senderID)
+                                    }) {
+                                        Image(systemName: "trash.fill")
+                                            .foregroundColor(.red)
+                                            .padding(8)
+                                            .background(Color.white)
+                                            .cornerRadius(20)
+                                    }
+                                    .padding(.trailing, 5)
+                                }
+
+                                // Like button
+                                Button(action: {
+                                    viewModel.toggleLike(chatID: chatID, messageID: message.id, userID: currentUserID)
+                                }) {
+                                    HStack {
+                                        Image(systemName: "hand.thumbsup.fill")
+                                            .foregroundColor(message.likes.contains(currentUserID) ? .blue : .gray)
+                                        Text("\(message.likes.count)")
+                                            .font(.subheadline)
+                                    }
+                                    .padding(8)
+                                    .background(Color.white)
+                                    .cornerRadius(20)
+                                }
+                                .padding(.trailing, 5)
+                            }
                         }
                     }
-                    .onChange(of: viewModel.messages) { _ in // New message sends screen to bottom
+                    .onChange(of: viewModel.messages) { _ in
                         if let lastMessage = viewModel.messages.last {
                             proxy.scrollTo(lastMessage.id, anchor: .bottom)
                         }
@@ -47,7 +79,7 @@ struct MessagingView: View {
                     .cornerRadius(30, corners: [.topLeft, .topRight])
                 }
                 .background(Color(.white))
-                
+
                 if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage)
                         .foregroundColor(.red)
@@ -66,15 +98,8 @@ struct MessagingView: View {
             }
         }
         .background(Color(.white))
-        // Displays all messages on appear
         .onAppear {
-            print("MessagingView appeared for chatID: \(chatID)")
             viewModel.loadMessages(for: chatID)
         }
     }
-}
-
-// Preview for MessagingView
-#Preview {
-    MessagingView(chatID: "Test", currentUserID: "ruI196nXC1e06whgCwpBJiwOnNX2", otherUserID: "1")
 }

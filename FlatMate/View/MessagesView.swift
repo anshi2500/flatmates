@@ -11,6 +11,7 @@ import FirebaseAuth
 struct MessagesView: View {
     @StateObject private var viewModel = MessagesViewModel()
     @State private var chatID: String? = nil
+    @State private var searchText: String = ""
 
     let currentUserID = Auth.auth().currentUser?.uid
 
@@ -24,8 +25,15 @@ struct MessagesView: View {
                     .padding(.horizontal)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
+                // Search Bar
+                TextField("Search Users", text: $searchText)
+                    .padding(10)
+                    .background(Color.gray.opacity(0.2))
+                    .cornerRadius(8)
+                    .padding(.horizontal)
+                
                 if viewModel.isLoading {
-                    // Loading Indicator, centered on screen
+                    // Loading Indicator
                     VStack {
                         Spacer()
                         ProgressView("Loading matches...")
@@ -42,33 +50,43 @@ struct MessagesView: View {
                             .frame(maxWidth: .infinity, alignment: .center)
                             .frame(maxHeight: .infinity, alignment: .center)
                     } else {
-                        // List of Matches
-                        ScrollView {
-                            VStack(spacing: 16) {
-                                ForEach(viewModel.matches) { match in
-                                    NavigationLink(
-                                        destination: {
-                                            if let chatID = match.chatID {
-                                                MessagingView(
-                                                    chatID: chatID,
-                                                    currentUserID: viewModel.currentUserID ?? "",
-                                                    otherUserID: match.id
+                        // Filtered List of Matches based on Search Query
+                        let filteredMatches = viewModel.matches.filter { match in
+                            searchText.isEmpty || match.name.lowercased().contains(searchText.lowercased())
+                        }
+
+                        if filteredMatches.isEmpty {
+                            Text("No results found.")
+                                .font(.custom("Outfit-Regular", size: 20))
+                                .foregroundColor(.gray)
+                        } else {
+                            ScrollView {
+                                VStack(spacing: 16) {
+                                    ForEach(filteredMatches) { match in
+                                        NavigationLink(
+                                            destination: {
+                                                if let chatID = match.chatID {
+                                                    MessagingView(
+                                                        chatID: chatID,
+                                                        currentUserID: viewModel.currentUserID ?? "",
+                                                        otherUserID: match.id
+                                                    )
+                                                } else {
+                                                    Text("Chat ID is not available.") // Fallback if chatID isn't ready
+                                                }
+                                            },
+                                            label: {
+                                                MatchRow(
+                                                    name: match.name,
+                                                    imageURL: match.imageURL
                                                 )
-                                            } else {
-                                                Text("Chat ID is not available.") // Fallback if chatID isn't ready
                                             }
-                                        },
-                                        label: {
-                                            MatchRow(
-                                                name: match.name,
-                                                imageURL: match.imageURL
-                                            )
-                                        }
-                                    )
+                                        )
+                                    }
                                 }
                             }
+                            .padding()
                         }
-                        .padding()
                     }
                 }
             }
@@ -80,8 +98,4 @@ struct MessagesView: View {
         }
         .navigationTitle("Messages")
     }
-}
-
-#Preview {
-    MessagesView()
 }

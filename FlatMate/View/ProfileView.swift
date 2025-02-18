@@ -65,11 +65,11 @@ struct ProfileView: View {
                     VStack(spacing: 20) {
                         HStack(spacing: 20) {
                             ProfileButton(
-                                icon: "settings_icon",
-                                label: "SETTINGS",
-                                isSelected: false,
-                                action: { print("Settings tapped!") }
-                            )
+                                    icon: "settings_icon",
+                                    label: "SETTINGS",
+                                    isSelected: false,
+                                    destination: AnyView(SettingsProfile())
+                                                        )
                             ProfileButton(
                                 icon: "logout_icon",
                                 label: "LOGOUT",

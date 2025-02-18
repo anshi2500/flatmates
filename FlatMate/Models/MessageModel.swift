@@ -14,5 +14,7 @@ struct Message: Identifiable, Equatable {
     let text: String
     let read: Bool
     let timestamp: Date
-    
+    var likes: [String] // Store user IDs of users who liked the message
+    var likesCount: Int
 }
+
