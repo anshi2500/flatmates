@@ -28,11 +28,12 @@ struct EditProfileView: View {
     @State private var selectedGuestFrequency: String = frequencies[0]
     @State private var noise: Double = 0.0
     @State private var profileImage: UIImage? = nil
-//    @State private var isImagePickerPresented = false
     @State private var errorMessage: String?
-//    @State private var selectedItem: PhotosPickerItem? = nil
     @State private var updateSuccess: Bool = false
-    @State private var showPixabaySheet = false
+    @State private var showPickerOptions = false         // triggers confirmationDialog
+    @State private var showPixabaySheet = false           // opens PixabaySearchView
+    @State private var showLocalPhotoPicker = false       // opens local PhotosPicker
+    @State private var selectedItem: PhotosPickerItem?
     
     var body: some View {
         NavigationView {
@@ -48,6 +49,7 @@ struct EditProfileView: View {
                         VStack {
                             ZStack {
                                 if let image = profileImage {
+                                    // user's currently chosen image
                                     Image(uiImage: image)
                                         .resizable()
                                         .clipShape(Circle())
@@ -60,7 +62,8 @@ struct EditProfileView: View {
                                 
                                 Button {
                                     // Show your pixabay sheet
-                                    showPixabaySheet = true
+                                    showPickerOptions = true
+
                                 } label: {
                                     Image(systemName: "plus")
                                         .font(.system(size: 15, weight: .bold))
@@ -166,9 +169,42 @@ struct EditProfileView: View {
             }
         } message: {
             Text("Changes Updated Successfully")
-        }.sheet(isPresented: $showPixabaySheet) {
+        }.confirmationDialog("Select Photo Source", isPresented: $showPickerOptions, actions: {
+            Button("Your Photos") {
+                // Show the local PhotosPicker
+                showLocalPhotoPicker = true
+            }
+            Button("Pixabay Photos") {
+                // Show the Pixabay search sheet
+                showPixabaySheet = true
+            }
+            Button("Cancel", role: .cancel) { }
+        })
+
+        .sheet(isPresented: $showLocalPhotoPicker) {
+            PhotosPicker(
+                selection: $selectedItem,
+                matching: .images,
+                photoLibrary: .shared()
+            ) {
+                //  UI label for the picker
+                Text("Select a Photo").font(.headline)
+            }
+            .onChange(of: selectedItem) { newItem in
+                guard let newItem else { return }
+                Task {
+                    if let data = try? await newItem.loadTransferable(type: Data.self),
+                       let uiImage = UIImage(data: data) {
+                        profileImage = uiImage
+                    }
+                    showLocalPhotoPicker = false // Dismiss the sheet after selection
+                }
+            }
+        }
+        
+        .sheet(isPresented: $showPixabaySheet) {
             PixabaySearchView { selectedImage in
-                // The user tapped a PixabayImage. We can load its largeImageURL or webformatURL.
+                
                 if let urlStr = selectedImage.largeImageURL ?? selectedImage.webformatURL,
                    let url = URL(string: urlStr) {
                     Task {
@@ -182,6 +218,8 @@ struct EditProfileView: View {
                         }
                     }
                 }
+                // Dismiss the sheet
+                showPixabaySheet = false
             }
         }
     }
