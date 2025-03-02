@@ -17,6 +17,8 @@ struct SignupView: View {
     @State private var showPasswordRules = false
     @State private var isPasswordVisible = false
     @State private var isConfirmPasswordVisible = false
+    @State private var showAlert = false
+    @State private var missingRequirements: [String] = []
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var viewModel: AuthViewModel
 
@@ -28,16 +30,15 @@ struct SignupView: View {
                     Image("Logo Straight Blue")
                         .resizable()
                         .scaledToFit()
-                        .frame(height: 103)
-                        .padding(.top, 15)
-                        .padding(.bottom, 18)
+                        .frame(height: 100)
+                        .padding(.top, 5)
                         .padding(.horizontal, 35)
                     
                     // Signup Title
                     Text("Create Your Account")
                         .font(.custom("Outfit-Bold", size: 28))
                         .multilineTextAlignment(.center)
-                        .padding(.bottom, 22)
+                        .padding(.bottom, 10)
                     
                     // Input Fields
                     VStack {
@@ -106,7 +107,18 @@ struct SignupView: View {
                                     }
                                     .padding(.trailing, 10)
                                 }
+                                
                             }
+                            // Password requirements checklist
+                            VStack(alignment: .leading, spacing: 5) {
+                                requirementCheck("At least 12 characters", password.count >= 12)
+                                requirementCheck("One uppercase letter", password.rangeOfCharacter(from: .uppercaseLetters) != nil)
+                                requirementCheck("One lowercase letter", password.rangeOfCharacter(from: .lowercaseLetters) != nil)
+                                requirementCheck("One number", password.rangeOfCharacter(from: .decimalDigits) != nil)
+                                requirementCheck("One special character", password.rangeOfCharacter(from: .punctuationCharacters) != nil || password.rangeOfCharacter(from: .symbols) != nil)
+                            }
+                            .padding(.bottom, 10)
+                            .padding(.top, 10)
                         }
                         
                         // Confirm Password input with visibility toggle on right side
@@ -174,7 +186,7 @@ struct SignupView: View {
                         }})
                     }
                     .padding(.horizontal, 20)
-                    .padding(.bottom, 20)
+                    .padding(.bottom, 10)
                     // Terms of Service and Privacy Policy
                     VStack {
                         (
@@ -189,7 +201,7 @@ struct SignupView: View {
                     .font(.custom("Outfit-Regular", size: 15))
                     .foregroundColor(.primary)
                     .padding(.horizontal, 15)
-                    .padding(.bottom, 35)
+                    .padding(.bottom, 5)
                     
                     // Already have an account? Log in button
                     Button(action: {
@@ -211,6 +223,16 @@ struct SignupView: View {
             }
             .scrollDismissesKeyboard(.interactively)
             .navigationBarHidden(true)
+        }
+    }
+    
+    private func requirementCheck(_ text: String, _ condition: Bool) -> some View {
+        HStack {
+            Image(systemName: condition ? "checkmark.circle.fill" : "circle")
+                .foregroundColor(condition ? .green : .gray)
+            Text(text)
+                .font(.footnote)
+                .foregroundColor(.gray.opacity(0.7))
         }
     }
     
