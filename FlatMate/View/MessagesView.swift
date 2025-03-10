@@ -11,9 +11,12 @@ import FirebaseAuth
 struct MessagesView: View {
     @StateObject private var viewModel = MessagesViewModel()
     @State private var searchText: String = ""
-
+    
+    // Access your NotificationViewModel from the environment
+    @EnvironmentObject var notificationVM: NotificationViewModel
+    
     let currentUserID = Auth.auth().currentUser?.uid
-
+    
     // Filter matches by search text
     var filteredMatches: [Match] {
         viewModel.matches.filter { match in
@@ -24,20 +27,21 @@ struct MessagesView: View {
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading) {
+                
                 // Large custom title
                 Text("Matches")
                     .font(.custom("Outfit-Bold", size: 38))
                     .foregroundColor(Color("primary"))
                     .padding(.horizontal)
                     .frame(maxWidth: .infinity, alignment: .leading)
-
+                
                 // Search Bar
                 TextField("Search Users", text: $searchText)
                     .padding(10)
                     .background(Color.gray.opacity(0.2))
                     .cornerRadius(8)
                     .padding(.horizontal)
-
+                
                 if viewModel.isLoading {
                     // Loading Indicator
                     VStack {
@@ -64,12 +68,32 @@ struct MessagesView: View {
                             ScrollView {
                                 VStack(spacing: 16) {
                                     ForEach(filteredMatches) { match in
-                                        NavigationLink(destination: destinationView(for: match)) {
-                                            MatchRow(
-                                                name: match.name,
-                                                imageURL: match.imageURL
-                                            )
-                                        }
+                                        // For each match, figure out how many unread from that user
+                                        let unreadCount = unreadCountFor(match.id)
+                                        
+                                        NavigationLink(
+                                            destination: destinationView(for: match),
+                                            label: {
+                                                HStack {
+                                                    // Show the match row with the user’s info
+                                                    MatchRow(name: match.name, imageURL: match.imageURL)
+                                                    
+                                                    Spacer()
+                                                    
+                                                    // If unreadCount > 0, show a blue dot + number
+                                                    if unreadCount > 0 {
+                                                        HStack(spacing: 6) {
+                                                            Circle()
+                                                                .fill(Color.blue)
+                                                                .frame(width: 8, height: 8)
+                                                            Text("\(unreadCount)")
+                                                                .foregroundColor(.black)
+                                                        }
+                                                        .padding(.trailing, 4)
+                                                    }
+                                                }
+                                            }
+                                        )
                                     }
                                 }
                                 .padding()
@@ -83,11 +107,21 @@ struct MessagesView: View {
                 print("MessagesView onAppear -> loadMatches()")
                 viewModel.loadMatches()
             }
-            // Hide the default navigation bar so only your custom UI is visible
+            // hiding the default navigation bar
             .navigationBarHidden(true)
         }
     }
-
+    
+    // Helper function to compute how many unread notifications exist
+    private func unreadCountFor(_ senderId: String) -> Int {
+        guard let me = currentUserID else { return 0 }
+        return notificationVM.notifications.filter {
+            $0.senderId == senderId &&
+            $0.receiverId == me &&
+            !$0.isRead
+        }.count
+    }
+    
     // Helper function returning the destination view for a given match.
     @ViewBuilder
     private func destinationView(for match: Match) -> some View {

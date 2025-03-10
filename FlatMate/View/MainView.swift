@@ -29,6 +29,7 @@ struct MainView: View {
                 
                 // Chat Tab
                 MessagesView()
+                    .environmentObject(notificationVM)
                     .tabItem {
                         tabIcon(for: .chat)
                         Text("Chat")
