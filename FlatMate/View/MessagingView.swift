@@ -5,9 +5,8 @@
 //  Created by Joey on 2024-11-18.
 //
 
-// TODO: Change colours to match UI. Was not sure about colour choice as our theme is pretty dark.
-
 import SwiftUI
+import FirebaseAuth
 
 struct MessagingView: View {
     @StateObject var viewModel: MessagingViewModel
@@ -36,8 +35,8 @@ struct MessagingView: View {
                         ForEach(viewModel.messages, id: \.id) { message in
                             HStack {
                                 MessageBubble(message: message, received: currentUserID != message.senderID)
-
-                                // Add a delete button for the current user's messages
+                                
+                                // Delete button for the current user's messages
                                 if message.senderID == currentUserID {
                                     Button(action: {
                                         viewModel.deleteMessage(chatID: chatID, messageID: message.id, senderID: message.senderID)
@@ -50,7 +49,7 @@ struct MessagingView: View {
                                     }
                                     .padding(.trailing, 5)
                                 }
-
+                                
                                 // Like button
                                 Button(action: {
                                     viewModel.toggleLike(chatID: chatID, messageID: message.id, userID: currentUserID)
@@ -78,15 +77,15 @@ struct MessagingView: View {
                     .background(Color.white)
                     .cornerRadius(30, corners: [.topLeft, .topRight])
                 }
-                .background(Color(.white))
-
+                .background(Color.white)
+                
                 if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage)
                         .foregroundColor(.red)
                         .padding()
                 }
             }
-
+            
             // Message input field
             MessageField(message: $newMessageText) { text in
                 viewModel.sendMessage(
@@ -97,9 +96,32 @@ struct MessagingView: View {
                 )
             }
         }
-        .background(Color(.white))
+        .background(Color.white)
         .onAppear {
+            print("MessagingView onAppear -> loadMessages(for: \(chatID))")
             viewModel.loadMessages(for: chatID)
+            
+            // Mark notifications from 'otherUserID' as read,
+            // so that only notifications from other senders remain.
+            if let loggedInUser = Auth.auth().currentUser?.uid, loggedInUser == currentUserID {
+                print("MessagingView -> Marking notifications from senderID: \(otherUserID) as read for receiverID: \(currentUserID)")
+                NotificationManager.shared.markAllNotificationsAsRead(
+                    senderID: otherUserID,
+                    receiverID: currentUserID
+                ) { error in
+                    if let error = error {
+                        print("Error marking notifications as read: \(error.localizedDescription)")
+                    } else {
+                        print("Successfully marked notifications from \(otherUserID) as read.")
+                    }
+                }
+            }
         }
+    }
+}
+
+struct MessagingView_Previews: PreviewProvider {
+    static var previews: some View {
+        MessagingView(chatID: "dummyChatID", currentUserID: "dummyCurrentUser", otherUserID: "dummyOtherUser")
     }
 }

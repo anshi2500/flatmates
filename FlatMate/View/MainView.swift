@@ -5,15 +5,20 @@
 //  Created by 李吉喆 on 2024-10-25.
 //
 
+import SwiftUICore
 import SwiftUI
 
 struct MainView: View {
     @State private var selectedTab: BottomNavigationBar.Tab = .home
     @State private var navigateToMessagesView: Bool = false
     
+    // Create the notification view model
+    @StateObject var notificationVM = NotificationViewModel()
+    
     var body: some View {
         NavigationView {
             TabView(selection: $selectedTab) {
+                
                 // Home Tab
                 SwipePageView(navigateToMessagesView: $navigateToMessagesView)
                     .tabItem {
@@ -21,15 +26,17 @@ struct MainView: View {
                         Text("Home")
                     }
                     .tag(BottomNavigationBar.Tab.home)
-
+                
                 // Chat Tab
                 MessagesView()
                     .tabItem {
                         tabIcon(for: .chat)
                         Text("Chat")
                     }
+                    // Show the unread count as a badge by passing the computed value directly
+                    .badge(notificationVM.unreadCount)
                     .tag(BottomNavigationBar.Tab.chat)
-
+                
                 // Profile Tab
                 ProfileView()
                     .tabItem {
@@ -41,15 +48,15 @@ struct MainView: View {
             .onChange(of: navigateToMessagesView) { newValue in
                 if newValue {
                     selectedTab = .chat
-                    navigateToMessagesView = false  // Reset the state after navigation
+                    navigateToMessagesView = false  // Reset after navigation
                 }
             }
         }
     }
-
+    
     @ViewBuilder
     private func tabIcon(for tab: BottomNavigationBar.Tab) -> some View {
-        let color = Color("primary") // Using your app's color asset
+        let color = Color("primary")
         
         switch tab {
         case .home:
