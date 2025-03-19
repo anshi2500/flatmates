@@ -84,18 +84,18 @@ struct EditProfileView: View {
                             HStack(spacing: 20){
                                 Text("First Name")
                                     .font(.custom("Outfit-Bold", fixedSize: 18))
-                                TextField(" ", text: $firstName)
+                                TextEditor(text: $firstName)
                                     .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray, lineWidth: 1))
-                                    .frame( height: 40)
+                                    .frame( height: 30)
                                 
                             }
                             
                             HStack(spacing: 20){
                                 Text("Last Name")
                                     .font(.custom("Outfit-Bold", fixedSize: 18))
-                                TextField(" ", text: $lastName)
+                                TextEditor(text: $lastName)
                                     .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray, lineWidth: 1))
-                                    .frame( height: 40)
+                                    .frame( height: 30)
                                 
                             }
                             
