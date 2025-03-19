@@ -109,7 +109,9 @@ struct EditProfileView: View {
                     
                     
                     // Gender Picker
-                    GenderPicker(selectedGender: $selectedGender)
+                      
+                        GenderPicker(selectedGender: $selectedGender)
+                    
                     
                     // Personal Bio
                     VStack(alignment: .leading) {

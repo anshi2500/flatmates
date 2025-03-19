@@ -14,7 +14,7 @@ struct GenderPicker: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text("Gender")
-                .font(.headline)
+                .font(.custom("Outfit-Bold", fixedSize: 18))
             Picker("Select Gender", selection: $selectedGender) {
                 ForEach(genders, id: \.self) { gender in
                     Text(gender).tag(gender)
