@@ -63,7 +63,7 @@ struct EditProfileView: View {
                                 Button {
                                     // Show your pixabay sheet
                                     showPickerOptions = true
-
+                                    
                                 } label: {
                                     Image(systemName: "plus")
                                         .font(.system(size: 15, weight: .bold))
@@ -74,19 +74,39 @@ struct EditProfileView: View {
                                 }
                                 .offset(x: 35, y: 35)
                             }
-
+                            
                         }
                         .padding(.trailing, 10)
+                    }
                         // First Name, Last Name, Date of Birth
-                        VStack(alignment: .leading) {
-                            ProfileField(title: "First Name", text: $firstName)
-                            ProfileField(title: "Last Name", text: $lastName)
+                    VStack(alignment: .leading) {
+                            
+                            HStack(spacing: 20){
+                                Text("First Name")
+                                    .font(.custom("Outfit-Bold", fixedSize: 18))
+                                TextField(" ", text: $firstName)
+                                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray, lineWidth: 1))
+                                    .frame( height: 40)
+                                
+                            }
+                            
+                            HStack(spacing: 20){
+                                Text("Last Name")
+                                    .font(.custom("Outfit-Bold", fixedSize: 18))
+                                TextField(" ", text: $lastName)
+                                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray, lineWidth: 1))
+                                    .frame( height: 40)
+                                
+                            }
+                            
+                            
                             DatePicker("Date of Birth", selection: $dob, displayedComponents: .date)
+                                 .font(.custom("Outfit-Bold", fixedSize: 18))
                                 .onChange(of: dob) { newDate in
                                     age = calculateAge(from: newDate)
                                 }
                         }
-                    }
+                    
                     
                     // Gender Picker
                     GenderPicker(selectedGender: $selectedGender)
@@ -94,7 +114,7 @@ struct EditProfileView: View {
                     // Personal Bio
                     VStack(alignment: .leading) {
                         Text("Personal Bio")
-                            .font(.custom("Outfit-Bold", fixedSize: 15))
+                            .font(.custom("Outfit-Bold", fixedSize: 18))
                         TextEditor(text: $bio)
                             .frame(height: 100)
                             .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray, lineWidth: 1))
@@ -103,18 +123,18 @@ struct EditProfileView: View {
                     
                     // Toggles
                     Toggle("I am a smoker.", isOn: $isSmoker)
-                        .font(.custom("Outfit-Bold", fixedSize: 15))
+                        .font(.custom("Outfit-Bold", fixedSize: 18))
                         .tint(Color("primary"))
                     Divider()
                     Toggle("I am a pet owner.", isOn: $petsOk)
-                        .font(.custom("Outfit-Bold", fixedSize: 15))
+                        .font(.custom("Outfit-Bold", fixedSize: 18))
                         .tint(Color("primary"))
                     Divider()
                     
                     // Party Frequency
                     VStack(alignment: .leading) {
                         Text("How often do you host parties?")
-                            .font(.custom("Outfit-Bold", fixedSize: 15))
+                            .font(.custom("Outfit-Bold", fixedSize: 18))
                         Picker("Parties", selection: $selectedPartyFrequency) {
                             ForEach(frequencies, id: \.self) { frequency in
                                 Text(frequency).tag(frequency)
@@ -126,7 +146,7 @@ struct EditProfileView: View {
                     // Guest Frequency
                     VStack(alignment: .leading) {
                         Text("How often do you have guests over?")
-                            .font(.custom("Outfit-Bold", fixedSize: 15))
+                            .font(.custom("Outfit-Bold", fixedSize: 18))
                         Picker("Guests", selection: $selectedGuestFrequency) {
                             ForEach(frequencies, id: \.self) { frequency in
                                 Text(frequency).tag(frequency)
@@ -138,7 +158,7 @@ struct EditProfileView: View {
                     // Noise Tolerance Slider
                     VStack(alignment: .leading) {
                         Text("Noise Tolerance")
-                            .font(.custom("Outfit-Bold", fixedSize: 15))
+                            .font(.custom("Outfit-Bold", fixedSize: 18))
                         HStack {
                             Text("Quiet")
                             Slider(value: $noise, in: 0...5, step: 0.1)
