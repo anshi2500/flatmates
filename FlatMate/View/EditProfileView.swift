@@ -5,6 +5,9 @@
 //  Created by Anshi on 2024-10-22.
 //
 
+
+// Have a list of additional profile photos the last circle should be a plus sign. Once the user adds 6, the plus sign disappears. 
+
 import SwiftUI
 import PhotosUI
 import FirebaseFirestore
@@ -44,12 +47,15 @@ struct EditProfileView: View {
                         .font(.custom("Outfit-Bold", size: 28))
                     Divider()
                     
-                    // Profile Picture
+                    // Profile Picture, and additional photos, user can add a max of 6
+                    
+                    
+                    
                     HStack {
                         VStack {
                             Spacer()
                             ZStack {
-                                Spacer()
+                                
                                 if let image = profileImage {
                                     // user's currently chosen image
                                     Image(uiImage: image)
@@ -74,12 +80,20 @@ struct EditProfileView: View {
                                         .background(Circle().fill(Color("primary")))
                                         .shadow(radius: 5)
                                 }
-                                .offset(x: 35, y: 35)
+                                .offset(x: 32, y: 35)
                             }
+                            
+                            Text("Main Profile Picture")
+                                .font(.custom("Ariel", size: 12))
+                                .foregroundColor(.gray)
+                                
                             
                         }
                         .padding(.trailing, 10)
                     }
+                    
+                    
+                    
                         // First Name, Last Name, Date of Birth
                     VStack(alignment: .leading) {
                             
