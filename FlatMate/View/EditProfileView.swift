@@ -47,7 +47,9 @@ struct EditProfileView: View {
                     // Profile Picture
                     HStack {
                         VStack {
+                            Spacer()
                             ZStack {
+                                Spacer()
                                 if let image = profileImage {
                                     // user's currently chosen image
                                     Image(uiImage: image)
@@ -98,11 +100,11 @@ struct EditProfileView: View {
                                     .frame( height: 30)
                                 
                             }
-                            
+                        
                             
                             DatePicker("Date of Birth", selection: $dob, displayedComponents: .date)
                                  .font(.custom("Outfit-Bold", fixedSize: 18))
-                                .onChange(of: dob) { newDate in
+                                 .onChange(of: dob) { newDate in
                                     age = calculateAge(from: newDate)
                                 }
                         }
