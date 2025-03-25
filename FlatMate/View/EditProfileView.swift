@@ -14,6 +14,7 @@ import FirebaseFirestore
 
 let genders = ["Select an option", "Female", "Male", "Non-binary", "Other"]
 let frequencies = ["Never", "Sometimes", "Always"]
+var ismainphoto: Bool = false
 
 struct EditProfileView: View {
     @EnvironmentObject var viewModel: AuthViewModel
@@ -37,6 +38,11 @@ struct EditProfileView: View {
     @State private var showPixabaySheet = false           // opens PixabaySearchView
     @State private var showLocalPhotoPicker = false       // opens local PhotosPicker
     @State private var selectedItem: PhotosPickerItem?
+    
+    // additional images array and states:
+    @State private var additionalImages: [UIImage?] = Array(repeating: nil, count: 6) // six placeholders for the additional images, can add up to 6
+    
+   
     
     var body: some View {
         NavigationView {
@@ -70,6 +76,7 @@ struct EditProfileView: View {
                                 
                                 Button {
                                     // Show your pixabay sheet
+                                    ismainphoto = true
                                     showPickerOptions = true
                                     
                                 } label: {
@@ -86,10 +93,73 @@ struct EditProfileView: View {
                             Text("Main Profile Picture")
                                 .font(.custom("Ariel", size: 12))
                                 .foregroundColor(.gray)
-                                
+                            
                             
                         }
                         .padding(.trailing, 10)
+                        
+                        HStack{
+                            VStack{
+                                HStack{ // first row of additional images
+                                    ForEach(0..<3, id: \.self){ index in
+                                        
+                                        if let image = additionalImages[index] {
+                                            Image(uiImage: image)
+                                                .resizable()
+                                                .clipShape(Circle())
+                                                .frame(width: 47, height: 47)
+                                        }
+                                        else{
+                                            Circle()
+                                                .fill(Color.gray)
+                                                .frame(width: 47, height: 47)
+                                        }
+                                        
+                                    }
+                                }
+                                
+                                
+                                HStack{ // second row of additional images
+                                    ForEach(3..<6, id: \.self){ index in
+                                        
+                                        if let image = additionalImages[index] {
+                                            Image(uiImage: image)
+                                                .resizable()
+                                                .clipShape(Circle())
+                                                .frame(width: 47, height: 47)
+                                        }
+                                        else{
+                                            Circle()
+                                                .fill(Color.gray)
+                                                .frame(width: 47, height: 47)
+                                            
+                                        }
+                                        
+                                    }
+                                    
+                                    
+                                }
+                                
+                                
+                            }
+                            
+                            if additionalImages.contains(nil) { // if additional images contains a nil, only then show a button
+                                Button {
+                                    showPickerOptions = true
+                                    ismainphoto = false
+                                    
+                                } label: {
+                                    Image(systemName: "plus")
+                                        .font(.system(size: 15, weight: .bold))
+                                        .foregroundColor(.white)
+                                        .frame(width: 50, height: 100)
+                                        .background(Circle().fill(Color("primary")))
+                                    
+                                }
+                                
+                            }
+                            
+                        }
                     }
                     
                     
@@ -233,7 +303,15 @@ struct EditProfileView: View {
                 Task {
                     if let data = try? await newItem.loadTransferable(type: Data.self),
                        let uiImage = UIImage(data: data) {
-                        profileImage = uiImage
+                        if ismainphoto == true{
+                            profileImage = uiImage
+                        }
+                        else{
+                            // add to the next availible placeholder
+                            if let emptyIndex = additionalImages.firstIndex(where: { $0 == nil }){
+                                additionalImages[emptyIndex] = uiImage
+                            }
+                        }
                     }
                     showLocalPhotoPicker = false // Dismiss the sheet after selection
                 }
@@ -309,6 +387,7 @@ struct EditProfileView: View {
         URLSession.shared.dataTask(with: url) { data, _, _ in
             if let data = data, let image = UIImage(data: data) {
                 DispatchQueue.main.async {
+                    
                     profileImage = image
                 }
             }
