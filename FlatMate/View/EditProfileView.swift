@@ -6,7 +6,9 @@
 //
 
 
-// Have a list of additional profile photos the last circle should be a plus sign. Once the user adds 6, the plus sign disappears. 
+// Have a list of additional profile photos the last circle should be a plus sign. Once the user adds 6, the plus sign disappears.
+// add a way to delete photos for both the main profile and the additional photos
+// the additonal photos need to be added to the firebase
 
 import SwiftUI
 import PhotosUI
@@ -139,9 +141,19 @@ struct EditProfileView: View {
                                     
                                     
                                 }
+                                Spacer()
+                                Text("Additional Photos")
+                                    .font(.custom("Ariel", size: 12))
+                                    .foregroundColor(.gray)
+                                    .lineLimit(1)
+                                    .padding(.leading, -30)
+                                
+                                
+                                
                                 
                                 
                             }
+                            
                             
                             if additionalImages.contains(nil) { // if additional images contains a nil, only then show a button
                                 Button {
@@ -152,7 +164,7 @@ struct EditProfileView: View {
                                     Image(systemName: "plus")
                                         .font(.system(size: 15, weight: .bold))
                                         .foregroundColor(.white)
-                                        .frame(width: 50, height: 100)
+                                        .frame(width: 50, height: 50)
                                         .background(Circle().fill(Color("primary")))
                                     
                                 }
@@ -379,6 +391,8 @@ struct EditProfileView: View {
                let url = URL(string: imageURLString) {
                 loadImage(from: url)
             }
+            
+
         }
     }
     
@@ -393,6 +407,10 @@ struct EditProfileView: View {
             }
         }.resume()
     }
+    
+    // function to upload additional images to firebase
+    
+    
     
     // Update profile data
     private func updateProfile() {
@@ -427,4 +445,6 @@ struct EditProfileView: View {
         let ageComponents = calendar.dateComponents([.year], from: dob, to: now)
         return ageComponents.year ?? 0
     }
+    
+    // make a function to update multiple images to the firebase
 }
