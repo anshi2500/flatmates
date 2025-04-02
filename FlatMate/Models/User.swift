@@ -22,6 +22,7 @@ struct User: Identifiable, Codable {
     var guestFrequency: String?
     var noise: Double?
     var profileImageURL: String?
+    var additionalImagesURLS: [String]?
     let hasCompletedOnboarding: Bool
 }
 

@@ -44,8 +44,8 @@ struct EditProfileView: View {
     // additional images array and states:
     @State private var additionalImages: [UIImage?] = Array(repeating: nil, count: 6) // six placeholders for the additional images, can add up to 6
     
-   
     
+ 
     var body: some View {
         NavigationView {
             ScrollView {
@@ -57,7 +57,7 @@ struct EditProfileView: View {
                     
                     // Profile Picture, and additional photos, user can add a max of 6
                     
-                    
+                
                     
                     HStack {
                         VStack {
@@ -176,39 +176,39 @@ struct EditProfileView: View {
                     
                     
                     
-                        // First Name, Last Name, Date of Birth
+                    // First Name, Last Name, Date of Birth
                     VStack(alignment: .leading) {
-                            
-                            HStack(spacing: 20){
-                                Text("First Name")
-                                    .font(.custom("Outfit-Bold", fixedSize: 18))
-                                TextEditor(text: $firstName)
-                                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray, lineWidth: 1))
-                                    .frame( height: 30)
-                                
-                            }
-                            
-                            HStack(spacing: 20){
-                                Text("Last Name")
-                                    .font(.custom("Outfit-Bold", fixedSize: 18))
-                                TextEditor(text: $lastName)
-                                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray, lineWidth: 1))
-                                    .frame( height: 30)
-                                
-                            }
                         
+                        HStack(spacing: 20){
+                            Text("First Name")
+                                .font(.custom("Outfit-Bold", fixedSize: 18))
+                            TextEditor(text: $firstName)
+                                .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray, lineWidth: 1))
+                                .frame( height: 30)
                             
-                            DatePicker("Date of Birth", selection: $dob, displayedComponents: .date)
-                                 .font(.custom("Outfit-Bold", fixedSize: 18))
-                                 .onChange(of: dob) { newDate in
-                                    age = calculateAge(from: newDate)
-                                }
                         }
+                        
+                        HStack(spacing: 20){
+                            Text("Last Name")
+                                .font(.custom("Outfit-Bold", fixedSize: 18))
+                            TextEditor(text: $lastName)
+                                .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray, lineWidth: 1))
+                                .frame( height: 30)
+                            
+                        }
+                        
+                        
+                        DatePicker("Date of Birth", selection: $dob, displayedComponents: .date)
+                            .font(.custom("Outfit-Bold", fixedSize: 18))
+                            .onChange(of: dob) { newDate in
+                                age = calculateAge(from: newDate)
+                            }
+                    }
                     
                     
                     // Gender Picker
-                      
-                        GenderPicker(selectedGender: $selectedGender)
+                    
+                    GenderPicker(selectedGender: $selectedGender)
                     
                     
                     // Personal Bio
@@ -300,7 +300,7 @@ struct EditProfileView: View {
             }
             Button("Cancel", role: .cancel) { }
         })
-
+        
         .sheet(isPresented: $showLocalPhotoPicker) {
             PhotosPicker(
                 selection: $selectedItem,
@@ -372,6 +372,7 @@ struct EditProfileView: View {
                 return
             }
             
+            
             // Populate fields
             firstName = data["firstName"] as? String ?? ""
             lastName = data["lastName"] as? String ?? ""
@@ -392,9 +393,16 @@ struct EditProfileView: View {
                 loadImage(from: url)
             }
             
-
+            if let additionalImageUrls = data["additionalImageURLs"] as? [String] {
+                    loadAdditionalImages(from: additionalImageUrls)
+                
+                
+            }
+            
+            
         }
     }
+
     
     // Load image from URL
     private func loadImage(from url: URL) {
@@ -408,14 +416,30 @@ struct EditProfileView: View {
         }.resume()
     }
     
-    // function to upload additional images to firebase
+    // load images from URL
     
-    
+    private func loadAdditionalImages(from urls: [String]) {
+        additionalImages = Array(repeating: nil, count: 6)
+        
+        for (index, urlString) in urls.enumerated() {
+            guard index < additionalImages.count, let url = URL(string: urlString) else { continue }
+            
+            URLSession.shared.dataTask(with: url) { data, _, _ in
+                if let data = data, let image = UIImage(data: data) {
+                    DispatchQueue.main.async {
+                        self.additionalImages[index] = image
+                    }
+                }
+            }.resume()
+        }
+    }
     
     // Update profile data
     private func updateProfile() {
         Task {
             do {
+                
+           
                 try await viewModel.updateProfile(
                     firstname: firstName,
                     lastname: lastName,
@@ -428,7 +452,8 @@ struct EditProfileView: View {
                     partyFrequency: selectedPartyFrequency,
                     guestFrequency: selectedGuestFrequency,
                     noise: noise,
-                    profileImage: profileImage
+                    profileImage: profileImage,
+                    additionalImages: additionalImages
                 )
                 errorMessage = nil
                 updateSuccess = true
@@ -447,4 +472,12 @@ struct EditProfileView: View {
     }
     
     // make a function to update multiple images to the firebase
+    
+    // download and add the images link to firebase
+   
+    
+    
+    
+    
+    
 }

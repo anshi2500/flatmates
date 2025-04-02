@@ -158,7 +158,8 @@ class AuthViewModel: ObservableObject {
         partyFrequency: String,
         guestFrequency: String,
         noise: Double,
-        profileImage: UIImage?
+        profileImage: UIImage?,
+        additionalImages: [UIImage?] // add the additional images to the profile 
     ) async throws {
         guard let uid = userSession?.uid else {
             print("DEBUG: No logged in user. Cannot update profile.")
@@ -194,9 +195,46 @@ class AuthViewModel: ObservableObject {
             } else {
                 print("DEBUG: No profileImage passed in, skipping image upload.")
             }
+            
+            var additionalImageUrls: [String] = []
+            
+            for (index, image) in additionalImages.enumerated() { // same thing as main profile images but looped
+                if let image = image, let imageData = image.jpegData(compressionQuality: 0.8) {
+                    print("DEBUG: Uploading additional image number \(index) for user \(uid)")
+                    let storageRef = Storage.storage().reference().child("additional_images/\(uid)/\(index).jpg")
+                    
+                    do {
+                        _ = try await storageRef.putDataAsync(imageData)
+                        let downloadURL = try await storageRef.downloadURL()
+                        print("DEBUG: Got download URL for additional image \(index):", downloadURL.absoluteString)
+                        additionalImageUrls.append(downloadURL.absoluteString)
+                    } catch {
+                        print("DEBUG: Failed to upload additional image \(index): \(error.localizedDescription)") // print the error if it doesnt work
+                        // Continue with next image even if one fails
+                        continue
+                    }
+                }
+                
+                else{
+                    print("DEBUG: No additionalImages passed in, skipping image upload.") // print this if none upload
+                }
+            }
+            
+            // upload the additional images
+            
+            
+                 
 
             // Update Firestore user doc
             print("DEBUG: Updating Firestore doc with:", updatedData)
+            
+            print("DEBUG: Additional Image URLs before updating Firestore:", additionalImageUrls)
+
+            
+            //updatedData["additionalImageURLs"] = additionalImageUrls
+            updatedData["additionalImageURLs"] = (currentUser?.additionalImagesURLS ?? []) + additionalImageUrls
+
+            
             let userRef = Firestore.firestore().collection("users").document(uid)
             try await userRef.updateData(updatedData)
             print("DEBUG: Successfully updated Firestore doc for \(uid)!")
@@ -216,6 +254,22 @@ class AuthViewModel: ObservableObject {
                 if let url = updatedData["profileImageURL"] as? String {
                     currentUser.profileImageURL = url
                 }
+                
+                if !additionalImageUrls.isEmpty {
+                    currentUser.additionalImagesURLS = additionalImageUrls
+                }
+                
+                //if let urls = updatedData["additionalImageURLs"] as? [String] {
+                        
+                        //if currentUser.additionalImagesURLS == nil {
+                            //currentUser.additionalImagesURLS = []
+                       // }
+                        // Replace existing URLs with new ones (or append if you prefer)
+                       // currentUser.additionalImagesURLS = urls
+                   // }
+                
+                
+                
                 self.currentUser = currentUser
             }
         } catch {
