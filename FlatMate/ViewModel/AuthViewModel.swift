@@ -74,14 +74,21 @@ class AuthViewModel: ObservableObject {
         guard let uid = userSession?.uid else { return }
         do {
             let snapshot = try await Firestore.firestore().collection("users").document(uid).getDocument()
-            if let data = snapshot.data() {
+            if let data = snapshot.data(),
+               let email = data["email"] as? String, !email.isEmpty {
                 self.currentUser = try Firestore.Decoder().decode(User.self, from: data)
                 self.hasCompletedOnboarding = self.currentUser?.hasCompletedOnboarding ?? false
+            } else {
+                print("User document is missing email. Redirecting to login view.")
+                // Sign the user out
+                self.signOut()
+               
             }
         } catch {
             print("DEBUG: Failed to fetch user data with error \(error.localizedDescription)")
         }
     }
+
     
     func submitOnboardingData(
         firstName: String,
@@ -110,7 +117,7 @@ class AuthViewModel: ObservableObject {
             "firstName": firstName,
             "lastName": lastName,
             "dob": dob,
-            "age": age, // Include the calculated age here
+            "age": age,
             "gender": gender,
             "bio": bio,
             "roomState": roomState,
@@ -120,20 +127,22 @@ class AuthViewModel: ObservableObject {
             "partyFrequency": partyFrequency,
             "guestFrequency": guestFrequency,
             "location": location,
-            "city": city,          // Add city
-            "province": province,  // Add province
-            "country": country,    // Add country
+            "city": city,
+            "province": province,
+            "country": country,
         ]
         
         do {
             print("Saving onboarding data to Firebase...")
-            try await Firestore.firestore().collection("users").document(userID).updateData(data)
+            // Use setData with merge: true to create the document if needed.
+            try await Firestore.firestore().collection("users").document(userID).setData(data, merge: true)
             onComplete() // Notify the caller that the operation is complete
         } catch {
             print("DEBUG: Failed to save onboarding data with error \(error.localizedDescription)")
             throw error
         }
     }
+
     
     func completeOnboarding() async throws {
         guard let uid = userSession?.uid else { return }
