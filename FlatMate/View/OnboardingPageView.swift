@@ -255,6 +255,7 @@ struct OnboardingPageView: View {
                     ButtonView(
                         title: self.currentStep == onboardingSteps.count - 1 ? "Submit" : "Next",
                         action: {
+                            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                             if !isStepComplete() {
                                 showAlert = true
                                 return
