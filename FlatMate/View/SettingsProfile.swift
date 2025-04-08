@@ -24,19 +24,21 @@ struct SettingsProfile: View {
             // Change Password Section
             VStack {
                 HStack {
-                    Text("Change Password")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity, alignment: .leading)  // Align text to the left
+                    //Text("Change Password")
+                      //  .font(.headline)
+                      //  .frame(maxWidth: .infinity, alignment: .leading)  // Align text to the left
                     
-                    Button("Change Password") {
+                    ButtonView(title: "Change Password") {
                         viewModel.showPasswordChangeAlert = true
                     }
                     
-                    .padding(.horizontal,20)  // Padding for button
+                    .padding(.horizontal,22)  // Padding for button
                     .padding(.vertical,15)
-                    .background(Color.blue)
+                    .frame(width: 400)
+                    //.background(Color("Primary"))
                     .foregroundColor(.white)
-                    .cornerRadius(8)
+                    
+                    //.cornerRadius(8)
                     .alert(isPresented: $viewModel.showPasswordChangeAlert) {
                         Alert(
                             title: Text("Password Reset"),
@@ -56,18 +58,16 @@ struct SettingsProfile: View {
             // Delete Account Section
             VStack {
                 HStack {
-                    Text("Delete Account")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity, alignment: .leading)  // Align text to the left
+                  
                     
-                    Button("Delete Account") {
+                    ButtonView(title:"Delete Account") { // used the deafult button view 
                         viewModel.showDeleteAccountAlert = true
                     }
                     .padding(.horizontal,26)  // Padding for button
                     .padding(.vertical,15)
-                    .background(Color.red)
                     .foregroundColor(.white)
                     .cornerRadius(8)
+                    .frame(width: 400)
                     .alert(isPresented: $viewModel.showDeleteAccountAlert) {
                         Alert(
                             title: Text("Delete Account"),
