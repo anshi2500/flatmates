@@ -9,82 +9,94 @@ import SwiftUI
 
 struct SettingsProfile: View {
     @StateObject private var viewModel = SettingsProfileViewModel()
-    
     @EnvironmentObject var authViewModel: AuthViewModel
+    
+    // For showing the LocationSearchView as a sheet
+    @State private var showingLocationSheet = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            // Settings Title
+            // Title
             Text("Settings")
                 .font(.custom("Outfit-Bold", size: 28))
-                .padding(.leading)  // To add some space from the left edge
+                .padding(.leading)
             
-            Divider()  // Grey line beneath the title
+            Divider()
             
-            // Change Password Section
-            VStack {
-                HStack {
-                    //Text("Change Password")
-                      //  .font(.headline)
-                      //  .frame(maxWidth: .infinity, alignment: .leading)  // Align text to the left
-                    
-                    ButtonView(title: "Change Password") {
-                        viewModel.showPasswordChangeAlert = true
-                    }
-                    
-                    .padding(.horizontal,22)  // Padding for button
-                    .padding(.vertical,15)
-                    .frame(width: 400)
-                    //.background(Color("Primary"))
-                    .foregroundColor(.white)
-                    
-                    //.cornerRadius(8)
-                    .alert(isPresented: $viewModel.showPasswordChangeAlert) {
-                        Alert(
-                            title: Text("Password Reset"),
-                            message: Text("We will send you a link to reset your password."),
-                            primaryButton: .default(Text("Send Email"), action: {
-                                viewModel.sendPasswordResetEmail()
-                            }),
-                            secondaryButton: .cancel()
-                        )
-                    }
-                    .fixedSize()  // Make the button fit its text size only
+            // ======= Change Password Button =======
+            ButtonView(title: "Change Password") {
+                viewModel.showPasswordChangeAlert = true
+            }
+            .padding(.horizontal, 22)
+            .padding(.vertical, 15)
+            .frame(width: 400)
+            .foregroundColor(.white)
+            .alert(isPresented: $viewModel.showPasswordChangeAlert) {
+                Alert(
+                    title: Text("Password Reset"),
+                    message: Text("We will send you a link to reset your password."),
+                    primaryButton: .default(Text("Send Email"), action: {
+                        viewModel.sendPasswordResetEmail()
+                    }),
+                    secondaryButton: .cancel()
+                )
+            }
+            .fixedSize()
+            
+            Divider()
+            
+            // ======= Change Location Button =======
+            ButtonView(title: "Change Location") {
+                showingLocationSheet = true
+            }
+            .padding(.horizontal, 22)
+            .padding(.vertical, 15)
+            .frame(width: 400)
+            .foregroundColor(.white)
+            
+            // If a new location is chosen, show the "Save Location" button
+            
+            
+            Divider()
+            
+            // ======= Delete Account Button =======
+            ButtonView(title: "Delete Account") {
+                viewModel.showDeleteAccountAlert = true
+            }
+            .padding(.horizontal, 22)
+            .padding(.vertical, 15)
+            .frame(width: 400)
+            .foregroundColor(.white)
+            .alert(isPresented: $viewModel.showDeleteAccountAlert) {
+                Alert(
+                    title: Text("Delete Account"),
+                    message: Text("Are you sure you want to delete your account? This action cannot be undone."),
+                    primaryButton: .destructive(Text("Delete")) {
+                        viewModel.deleteAccount(viewModel: authViewModel)
+                    },
+                    secondaryButton: .cancel()
+                )
+            }
+            .fixedSize()
+            
+            Divider()
+            
+            if !viewModel.newLocation.isEmpty {
+                Button(action: {
+                    viewModel.updateLocation(authVM: authViewModel)
+                }) {
+                    Text("Save Location")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color("primary"))
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
                 }
+                .padding(.horizontal)
             }
             
-            Divider()  // Grey line beneath Change Password
-            
-            // Delete Account Section
-            VStack {
-                HStack {
-                  
-                    
-                    ButtonView(title:"Delete Account") { // used the deafult button view 
-                        viewModel.showDeleteAccountAlert = true
-                    }
-                    .padding(.horizontal,26)  // Padding for button
-                    .padding(.vertical,15)
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
-                    .frame(width: 400)
-                    .alert(isPresented: $viewModel.showDeleteAccountAlert) {
-                        Alert(
-                            title: Text("Delete Account"),
-                            message: Text("Are you sure you want to delete your account? This action cannot be undone."),
-                            primaryButton: .destructive(Text("Delete")) {
-                                viewModel.deleteAccount(viewModel: authViewModel)
-                            },
-                            secondaryButton: .cancel()
-                        )
-                    }
-                    .fixedSize()  // Make the button fit its text size only
-                }
-            }
-
-            Divider()  // Grey line beneath Delete Account
-            
-            // Success or Loading Message
+            // ======= Success or Loading Message =======
             if viewModel.isSuccessMessageVisible {
                 Text(viewModel.successMessage)
                     .foregroundColor(.green)
@@ -92,19 +104,28 @@ struct SettingsProfile: View {
                     .transition(.opacity)
             }
             
-            // Loading Indicator
             if viewModel.isLoading {
                 ProgressView()
                     .progressViewStyle(CircularProgressViewStyle())
                     .padding()
             }
         }
-        .padding([.leading, .trailing])  // Horizontal padding for spacing
-        .frame(maxWidth: .infinity, alignment: .top)  // Aligns the content to the top
-        .edgesIgnoringSafeArea(.top)  // Ensure the content goes right to the top edge
-        .background(Color.white)  // Background color to make sure the content area is clear
+        .padding([.leading, .trailing])
+        .frame(maxWidth: .infinity, alignment: .top)
+        .edgesIgnoringSafeArea(.top)
+        .background(Color.white)
+        .fullScreenCover(isPresented: $showingLocationSheet) {
+            // Present the LocationSearchView as a sheet
+            // No changes needed in LocationSearchView
+            LocationSearchView(
+                selectedLocation: $viewModel.newLocation,
+                city: $viewModel.city,
+                province: $viewModel.province,
+                country: $viewModel.country
+            )
+        }
         .fullScreenCover(isPresented: $viewModel.navigateToSignup) {
-            LandingPageView()  // Navigates to the signup screen
+            LandingPageView()
         }
     }
 }

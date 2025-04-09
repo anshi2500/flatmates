@@ -49,8 +49,15 @@ struct LocationSearchView: View {
                     }
                 }
             }
-            .navigationTitle("Enter the area where you want to find a flatmate.")
+            .navigationTitle("Enter the Location.")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+           ToolbarItem(placement: .navigationBarLeading) {
+               Button("Back") {
+                   presentationMode.wrappedValue.dismiss()
+               }
+           }
+       }
         }
     }
     

@@ -9,6 +9,7 @@ import SwiftUI
 import FirebaseAuth
 import FirebaseFirestore
 
+@MainActor
 class SettingsProfileViewModel: ObservableObject {
     @Published var showPasswordChangeAlert = false
     @Published var errorMessage = ""
@@ -17,8 +18,53 @@ class SettingsProfileViewModel: ObservableObject {
     @Published var showDeleteAccountAlert = false
     @Published var isDeletingAccount = false
     @Published var navigateToSignup = false
-    
     @Published var isLoading = false
+    
+    @Published var newLocation: String = ""
+       @Published var city: String = ""
+       @Published var province: String = ""
+       @Published var country: String = ""
+       
+       // Update location function
+       func updateLocation(authVM: AuthViewModel) {
+           guard let uid = authVM.currentUser?.id else {
+               print("updateLocation: No user id")
+               return
+           }
+           guard !newLocation.isEmpty else {
+               print("updateLocation: newLocation is empty")
+               return
+           }
+           
+        
+           print("updateLocation called with:")
+           print("newLocation: \(newLocation)")
+           print("city: \(city)")
+           print("province: \(province)")
+           print("country: \(country)")
+           
+           isLoading = true
+           let db = Firestore.firestore()
+           let data: [String: Any] = [
+               "location": newLocation,
+               "city": city,
+               "province": province,
+               "country": country
+           ]
+           db.collection("users").document(uid).setData(data, merge: true) { [weak self] error in
+               guard let self = self else { return }
+               self.isLoading = false
+               if let error = error {
+                   print("Error updating location: \(error.localizedDescription)")
+                   self.successMessage = "Failed to update location."
+               } else {
+                   print("Successfully updated location to \(self.newLocation)")
+                   self.successMessage = "Location updated!"
+               }
+               self.isSuccessMessageVisible = true
+           }
+       }
+       
     
     func sendPasswordResetEmail() {
         guard let userEmail = Auth.auth().currentUser?.email else {
@@ -70,7 +116,7 @@ class SettingsProfileViewModel: ObservableObject {
                     self.errorMessage = "Error deleting account from Firebase Auth: \(error.localizedDescription)"
                 } else {
                     // Account deleted successfully, handle navigation or logout
-                    viewModel.signOut()  // Assuming signOut() will log the user out
+                    viewModel.signOut()  // Sign out the user
                     self.navigateToSignup = true  // Navigate to the signup screen
                 }
                 self.isDeletingAccount = false
