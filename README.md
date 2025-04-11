@@ -129,6 +129,6 @@ Project Link: [https://github.com/users/Anidion/projects/1/views/1](https://gith
 
 ---
 
-Developed with ❤️ by Ivan, Anshi, Alina, Ben, Bradley, Jessie, Joey, Lilia, Nayera and Youssef.
+Developed with ❤️ by Anshi, Ben, Bradley, Jessie, Joey, Lilia, Nayera and Youssef.
 
-Development Continued by ...
+Development Continued by Kevin, Ivan, Anshi, Alina, Doowon, Jungsu, Lilia
