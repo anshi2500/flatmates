@@ -26,6 +26,14 @@ FlatMates is a modern iOS application designed to help users find compatible roo
 - Modern, intuitive design
 - Comprehensive onboarding process
 
+### Notifications
+ - Real-time push notifications for new messages using Firebase Cloud Messaging (FCM).
+ - iOS badge updates and in-app alerts to keep users informed and engaged.
+   
+### Pixabay API Integration
+ - Leverages the Pixabay API to access a vast library of high-quality, royalty-free images.
+ - Enhances the app’s visual appeal with dynamic image fetching, improving user experience.
+   
 ### Profile Management
 - Customizable user profiles
 - Profile picture upload
@@ -120,6 +128,6 @@ Project Link: [https://github.com/users/Anidion/projects/1/views/1](https://gith
 
 ---
 
-Developed with ❤️ by Anshi, Ben, Bradley, Jessie, Joey, Lilia, Nayera and Youssef.
+Developed with ❤️ by Ivan, Anshi, Ben, Bradley, Jessie, Joey, Lilia, Nayera and Youssef.
 
 Development Continued by ...
