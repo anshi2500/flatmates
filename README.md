@@ -55,6 +55,7 @@ FlatMates is a modern iOS application designed to help users find compatible roo
 - Firebase Authentication
 - Firebase Firestore for database
 - Firebase Storage for media
+- PixaBay API
 
 ## Requirements
 - iOS 18.0 or later
