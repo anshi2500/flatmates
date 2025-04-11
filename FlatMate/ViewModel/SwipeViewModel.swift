@@ -18,12 +18,12 @@ class SwipeViewModel: ObservableObject {
     }
     
     func handleSwipe(userID: String, targetUserID: String, isLike: Bool, completion: @escaping (Bool) -> Void) {
-        // Step 1: Immediately remove the swiped profile locally
+        // Immediately remove the swiped profile locally
         profiles.removeAll { $0.id == targetUserID }
         
-        // Step 2: Update Firestore and handle match
+        // Update Firestore and handle match
         matchService.swipe(userID: userID, targetUserID: targetUserID, isLike: isLike) { isMatch in
-            // Step 3: Update Firestore to track swiped profile
+            // Update Firestore to track swiped profile
             let db = Firestore.firestore()
             db.collection("users").document(userID).updateData([
                 "swipedProfiles": FieldValue.arrayUnion([targetUserID])
@@ -32,7 +32,7 @@ class SwipeViewModel: ObservableObject {
                     print("Error updating swiped profiles: \(error.localizedDescription)")
                 }
                 
-                // Step 4: Ensure UI is updated on main thread
+                // Ensure UI is updated on main thread
                 DispatchQueue.main.async {
                     // Double-check removal in case of race conditions
                     self.profiles.removeAll { $0.id == targetUserID }
@@ -63,10 +63,10 @@ class SwipeViewModel: ObservableObject {
             let userDoc = try await db.collection("users").document(currentUserID).getDocument()
             let swipedProfiles = userDoc.data()?["swipedProfiles"] as? [String] ?? []
             
-            //  Also figure out the city of this user (default to empty if missing)
+   
             let currentUserCity = userDoc.data()?["city"] as? String ?? ""
             
-            //  Also fetch existing matches so we can exclude them
+            // fetch existing matches so we can exclude them
             let matchesSnapshot = try await db.collection("matches").getDocuments()
             let matchedProfiles = matchesSnapshot.documents.compactMap { doc -> String? in
                 let data = doc.data()

@@ -30,6 +30,7 @@ class PixabayService: ObservableObject {
         
         let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query
         
+        // url for the api
         let urlString = "https://pixabay.com/api/?key=\(apiKey)&q=\(encodedQuery)&image_type=photo"
         
         guard let url = URL(string: urlString) else {

@@ -23,7 +23,7 @@ struct SettingsProfile: View {
             
             Divider()
             
-            // ======= Change Password Button =======
+            // Change Password Button
             ButtonView(title: "Change Password") {
                 viewModel.showPasswordChangeAlert = true
             }
@@ -45,7 +45,7 @@ struct SettingsProfile: View {
             
             Divider()
             
-            // ======= Change Location Button =======
+            // Change Location Button
             ButtonView(title: "Change Location") {
                 showingLocationSheet = true
             }
@@ -59,7 +59,7 @@ struct SettingsProfile: View {
             
             Divider()
             
-            // ======= Delete Account Button =======
+            // Delete Account Button
             ButtonView(title: "Delete Account") {
                 viewModel.showDeleteAccountAlert = true
             }
@@ -96,7 +96,7 @@ struct SettingsProfile: View {
                 .padding(.horizontal)
             }
             
-            // ======= Success or Loading Message =======
+            // Success or Loading Message
             if viewModel.isSuccessMessageVisible {
                 Text(viewModel.successMessage)
                     .foregroundColor(.green)
@@ -115,8 +115,7 @@ struct SettingsProfile: View {
         .edgesIgnoringSafeArea(.top)
         .background(Color.white)
         .fullScreenCover(isPresented: $showingLocationSheet) {
-            // Present the LocationSearchView as a sheet
-            // No changes needed in LocationSearchView
+            // LocationSearchView as a sheet
             LocationSearchView(
                 selectedLocation: $viewModel.newLocation,
                 city: $viewModel.city,

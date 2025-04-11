@@ -72,7 +72,7 @@ class MessagingViewModel: ObservableObject {
                 switch result {
                 case .success:
                     print("Like toggled successfully")
-                    // Optionally update the local list of messages after liking/disliking
+                    
                     self?.loadMessages(for: chatID)
                 case .failure(let error):
                     self?.errorMessage = "Error toggling like: \(error.localizedDescription)"

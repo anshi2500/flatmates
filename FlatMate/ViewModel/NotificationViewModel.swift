@@ -61,7 +61,7 @@ class NotificationViewModel: ObservableObject {
         }
     }
     
-    // fetch
+    // fetch notification
     func loadNotificationsOnce() {
         guard let userID = Auth.auth().currentUser?.uid else {
             print("No user ID in loadNotificationsOnce()")

@@ -9,7 +9,7 @@ import Foundation
 import FirebaseFirestore
 
 struct Notification: Identifiable {
-    var id: String?           // Firestore document ID (optional)
+    var id: String?           // Firestore document ID 
     
     let receiverId: String    // The ID of the user receiving the notification
     let senderId: String      // The ID of the user sending the notification
